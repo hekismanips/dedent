@@ -1,0 +1,38 @@
+[
+  {
+    "id": "f_0_0_0",
+    "key": "patientDetails",
+    "name": "Patient Details",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Hidden Patient Information"
+  },
+  {
+    "id": "f_0_0_1",
+    "key": "contactInformation",
+    "name": "Contact Information",
+    "logic": null,
+    "repeatable": true,
+    "class": "object",
+    "parentName": "Hidden Patient Information"
+  },
+  {
+    "id": "f_0_0_2",
+    "key": "registrationDetails",
+    "name": "Registration Details",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Hidden Patient Information"
+  },
+  {
+    "id": "f_0_0_3",
+    "key": "emergencyContacts",
+    "name": "Emergency Contacts",
+    "logic": null,
+    "repeatable": true,
+    "class": "object",
+    "parentName": "Hidden Patient Information"
+  }
+]

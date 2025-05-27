@@ -1,0 +1,47 @@
+[
+  {
+    "id": "f_1_0",
+    "key": "chiefComplaint",
+    "name": "Chief Complaint",
+    "logic": null,
+    "repeatable": true,
+    "class": "object",
+    "parentName": "Subjective"
+  },
+  {
+    "id": "f_1_1",
+    "key": "medicalDrugHistory",
+    "name": "Medical / Drug History",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Subjective"
+  },
+  {
+    "id": "f_1_2",
+    "key": "dentalHistory",
+    "name": "Dental History",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Subjective"
+  },
+  {
+    "id": "f_1_3",
+    "key": "familyHistory",
+    "name": "Family History",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Subjective"
+  },
+  {
+    "id": "f_1_4",
+    "key": "socialHistory",
+    "name": "Social History",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Subjective"
+  }
+]

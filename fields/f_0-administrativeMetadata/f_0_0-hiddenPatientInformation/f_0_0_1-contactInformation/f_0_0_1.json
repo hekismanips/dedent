@@ -1,0 +1,29 @@
+[
+  {
+    "id": "f_0_0_1_0",
+    "key": "contactType",
+    "name": "Contact Type",
+    "logic": null,
+    "repeatable": false,
+    "class": "value",
+    "parentName": "Contact Information"
+  },
+  {
+    "id": "f_0_0_1_1",
+    "key": "contactDetail",
+    "name": "Contact Detail",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Contact Information"
+  },
+  {
+    "id": "f_0_0_1_2",
+    "key": "preferredMethod",
+    "name": "Preferred Method",
+    "logic": null,
+    "repeatable": false,
+    "class": "boolean",
+    "parentName": "Contact Information"
+  }
+]

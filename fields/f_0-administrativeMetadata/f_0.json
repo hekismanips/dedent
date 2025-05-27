@@ -1,0 +1,42 @@
+[
+  {
+    "id": "f_0_0",
+    "key": "hiddenPatientInformation",
+    "name": "Hidden Patient Information",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "Administrative Metadata"
+  },
+  {
+    "id": "f_0_1",
+    "key": "displayedPatientInformation",
+    "name": "Displayed Patient Information",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "Administrative Metadata"
+  },
+  {
+    "id": "f_0_2",
+    "key": "dentalOfficerInformation",
+    "name": "Dental Officer Information",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "Administrative Metadata"
+  },
+  {
+    "id": "f_0_3",
+    "key": "abstractOfCase",
+    "name": "Abstract of Case",
+    "logic": null,
+    "repeatable": false,
+    "class": "textarea",
+    "inputType": null,
+    "parentName": "Administrative Metadata"
+  }
+]

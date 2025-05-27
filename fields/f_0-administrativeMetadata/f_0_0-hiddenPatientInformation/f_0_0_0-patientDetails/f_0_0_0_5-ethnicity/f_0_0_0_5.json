@@ -1,0 +1,29 @@
+[
+  {
+    "id": "f_0_0_0_5_0",
+    "key": "malay",
+    "name": "Malay",
+    "logic": null,
+    "repeatable": false,
+    "class": "option",
+    "parentName": "Ethnicity"
+  },
+  {
+    "id": "f_0_0_0_5_1",
+    "key": "chinese",
+    "name": "Chinese",
+    "logic": null,
+    "repeatable": false,
+    "class": "option",
+    "parentName": "Ethnicity"
+  },
+  {
+    "id": "f_0_0_0_5_2",
+    "key": "indian",
+    "name": "Indian",
+    "logic": null,
+    "repeatable": false,
+    "class": "option",
+    "parentName": "Ethnicity"
+  }
+]

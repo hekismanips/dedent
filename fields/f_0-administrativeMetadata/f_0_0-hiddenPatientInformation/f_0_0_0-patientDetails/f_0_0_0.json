@@ -1,0 +1,83 @@
+[
+  {
+    "id": "f_0_0_0_0",
+    "key": "fullName",
+    "name": "Full Name",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "text",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_1",
+    "key": "identificationNumber",
+    "name": "Identification Number",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "text",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_2",
+    "key": "dateOfBirth",
+    "name": "Date of Birth",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "date",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_3",
+    "key": "age",
+    "name": "Age",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "number",
+    "min": 0,
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_4",
+    "key": "nationality",
+    "name": "Nationality",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "text",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_5",
+    "key": "ethnicity",
+    "name": "Ethnicity",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "list",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_6",
+    "key": "gender",
+    "name": "Gender",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "list",
+    "parentName": "Patient Details"
+  },
+  {
+    "id": "f_0_0_0_7",
+    "key": "language",
+    "name": "Language",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "list",
+    "parentName": "Patient Details"
+  }
+]

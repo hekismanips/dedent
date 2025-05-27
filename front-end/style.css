@@ -1,0 +1,22 @@
+.derpButton, h1 {
+  font-family: 'Kumbh Sans';
+}
+.derpButton {
+  border-radius: 10px;
+  font-family: 'Kumbh Sans';
+  border: none;
+  width: 20vw;
+  height: 15vh;
+  padding: 10px;
+}
+button:hover{
+  cursor: pointer;
+}
+.buttonH2 {
+  font-size: large;
+  text-align: left;
+  margin-bottom: 10px;
+}
+.buttonP {
+  text-align: left;
+}
