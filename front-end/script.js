@@ -1,6 +1,6 @@
 const body = document.getElementById('body');
 window.onload = function () {
-  renderFields('../dedent/fields/f.json', 'body', 'DERP');
+  renderFields('https://www.hekismanips.github.io/dedent/fields/f.json', 'body', 'DERP');
 };
 
 
