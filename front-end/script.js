@@ -61,6 +61,7 @@ async function fetchDataList(childJSON, id) {
 
 // Core render function: given a parentLocation, draw all its fields into `container`
 async function renderFields(jsonPath, containerID, name, repeatability) {
+      console.log(jsonPath);
   const container = document.getElementById(containerID);
   container.innerHTML = "<p>Loading…</p>";       // optional loading state
 
@@ -105,7 +106,6 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
   // 1. load current defs
   let defs = [];
   try {
-    console.log(jsonPath);
     const res = await fetch(jsonPath);            // e.g. "/fields/f0.json"
     if (!res.ok) throw new Error(res.statusText);
     defs = await res.json();                      // your array of field defs
