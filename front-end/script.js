@@ -1,6 +1,6 @@
 const body = document.getElementById('body');
 window.onload = function () {
-  renderFields('../fields/f.json', 'body', 'DERP');
+  renderFields('dedent/fields/f.json', 'body', 'DERP');
 };
 
 
