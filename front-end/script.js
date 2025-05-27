@@ -105,6 +105,7 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
   // 1. load current defs
   let defs = [];
   try {
+    console.log(jsonPath);
     const res = await fetch(jsonPath);            // e.g. "/fields/f0.json"
     if (!res.ok) throw new Error(res.statusText);
     defs = await res.json();                      // your array of field defs
