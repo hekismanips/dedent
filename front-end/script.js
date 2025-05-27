@@ -67,7 +67,7 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
   // define upperPath
   let backButton;
   const parts = jsonPath.split('/');
-  if (parts.length > 3) {
+  if (parts.length > 4) {
     const dir = parts.slice(0, parts.length - 2).join('/');
     const segments = parts[parts.length-2].split('_');
     const prefix = segments.slice(0, -1).join('_');
