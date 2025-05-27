@@ -61,7 +61,6 @@ async function fetchDataList(childJSON, id) {
 
 // Core render function: given a parentLocation, draw all its fields into `container`
 async function renderFields(jsonPath, containerID, name, repeatability) {
-      console.log(jsonPath);
   const container = document.getElementById(containerID);
   container.innerHTML = "<p>Loading…</p>";       // optional loading state
 
