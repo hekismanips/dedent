@@ -1,6 +1,6 @@
 const body = document.getElementById('body');
 window.onload = function () {
-  renderFields('https://www.hekismanips.github.io/dedent/fields/f.json', 'body', 'DERP');
+  renderFields('https://www.hekismanips.github.io/fields/f.json', 'body', 'DERP');
 };
 
 
@@ -67,7 +67,7 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
   // define upperPath
   let backButton;
   const parts = jsonPath.split('/');
-  if (parts.length > 6) {
+  if (parts.length > 5) {
     const dir = parts.slice(0, parts.length - 2).join('/');
     const segments = parts[parts.length-2].split('_');
     const prefix = segments.slice(0, -1).join('_');
