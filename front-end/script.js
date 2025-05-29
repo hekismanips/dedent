@@ -257,7 +257,7 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
 let library = [];
 async function fetchLibrary() {
   try {
-    const res = await fetch('/fields/library.json');            // fetch library.json NOT libraryID.json (no such thing)
+    const res = await fetch('https://dedent.org/fields/library.json');            // fetch library.json NOT libraryID.json (no such thing)
     if (!res.ok) throw new Error(res.statusText);
     library = await res.json();                      // your array of field defs
   } catch (err) {
