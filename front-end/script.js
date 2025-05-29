@@ -1,6 +1,16 @@
 const body = document.getElementById('body');
 window.onload = function () {
   renderFields('https://dedent.org/fields/f.json', 'body', 'DERP');
+  fetchLibrary();
+  document.getElementById('head').innerHTML = `
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css" />
+    <title>DERP</title>
+  `
 };
 
 
@@ -38,6 +48,18 @@ function checkLogic(expr) {
   checkLogic(expr);  // returns true or false
 */
 
+// Fetching function
+async function fetching(json) {
+  try {
+    const res = await fetch(childJSON);            // e.g. "/fields/f0.json"
+    if (!res.ok) throw new Error(res.statusText);
+    return await res.json();                      // your array of field defs
+  } catch (err) {
+    console.log('<p class="error">Couldn’t load fields.</p>');
+    return;
+  }
+}
+
 // Instructs which DOM element needs to add details
 async function fetchDataList(childJSON, id) {
   // 1. load current defs
@@ -59,15 +81,18 @@ async function fetchDataList(childJSON, id) {
   document.getElementById(`${id}`) ? document.getElementById(`${id}`).innerHTML = float : '';
 }
 
+// Suggestion Keywords Registry
+let suggestionRegistry = [];
+
 // Core render function: given a parentLocation, draw all its fields into `container`
 async function renderFields(jsonPath, containerID, name, repeatability) {
   const container = document.getElementById(containerID);
   container.innerHTML = "<p>Loading…</p>";       // optional loading state
-
+  suggestionRegistry = [];
   // define upperPath
   let backButton;
   const parts = jsonPath.split('/');
-  if (parts.length > 5) {
+  if (parts.length > 3) {
     const dir = parts.slice(0, parts.length - 2).join('/');
     const segments = parts[parts.length-2].split('_');
     const prefix = segments.slice(0, -1).join('_');
@@ -217,12 +242,123 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
         </div>
       `;
     }
+
+    // 4️⃣ suggestion registering
+    if (def.libraryId) {
+      suggestionRegistry.push([def.id, def.libraryId, def.logicDefinition ? def.logicDefinition : null]);
+    }
   });
 
   // replace the loading message with the built HTML
-  container.innerHTML = html + '</div>';
+  container.innerHTML = html + '</div><div id="suggestionPane"></div>';
 }
 
-async function suggestKeywords() {
-  
+// Fetch the library.json
+let library = [];
+async function fetchLibrary() {
+  try {
+    const res = await fetch('/fields/library.json');            // fetch library.json NOT libraryID.json (no such thing)
+    if (!res.ok) throw new Error(res.statusText);
+    library = await res.json();                      // your array of field defs
+  } catch (err) {
+    console.log('<p class="error">Couldn’t load fields.</p>');
+    return;
+  }
+}
+
+// Global listener function
+document.getElementById('body').addEventListener('click', e => {
+  if (e.target.tagName !== 'INPUT') return;            // ignore non-inputs
+  const idx = suggestionRegistry.findIndex(([f]) => f === e.target.id);
+  if (idx === -1) return;                              // not registered for suggestions
+  suggestKeywords(suggestionRegistry[idx]);             // trigger suggestion workflow
+});
+
+// showSuggestions Workflow   
+async function suggestKeywords([fieldId, libraryId, logicDef]) {
+  // The Suggstion Div
+  const suggestion = document.getElementById('suggestionPane') ? document.getElementById('suggestionPane') : '';
+  // Creating the array
+  const index = library.findIndex(item => item.id === libraryId);
+  const nefs = index !== -1 ? library[index] : null;
+
+  let html = '';
+
+  // Generating UI
+  if (nefs !== null) {
+    // reads the nefs.data, else if false then no point generating the UI
+    // a data consists of [id, key, description, data], the loop stops for a particular when data = null, then continues the next loop.
+    // hierarchy definition
+    nefsLoop(nefs);
+  };
+
+  /*
+  if (nefs !== null) {
+
+    // This section repeats on itself
+    -------------------------------------------------------
+    if (nefs.logic || checkLogic(nefs.logic)) {
+      if (nefs.data !== null) {
+        html += hHeadParser (nefs);
+        for (let i = 0; i < nefs.data.length; i++) {
+          
+          //Repeats here, the difference? every repeat it lengthens -> nefs.data[i].data[j].da....... till infinity
+        
+        }
+        html += '</div>';
+      } else {
+        html += hEndParser(nefs, fieldId);
+      }
+    }
+    -------------------------------------------------------
+
+  }
+  */
+
+  function nefsLoop(nefs) {
+    if (!nefs.logic || checkLogic(nefs.logic)) {
+      if (nefs.data !== null) {
+        html += hHeadParser (nefs);
+        for (let i = 0; i < nefs.data.length; i++) {
+          nefsLoop(nefs.data[i]);        
+        }
+        html += '</div></div>';
+      } else {
+        html += hEndParser(nefs, fieldId);
+      }
+    }
+  }
+
+  function hHeadParser (nefs) {
+    return `
+      <div>
+      <label>
+        ${nefs.description}
+      </label>
+      <div>
+    `
+  }
+  function hEndParser (nefs, fieldId) {
+    return `
+      <button 
+        id="${nefs.id}" 
+        onclick="registerSuggestion(${nefs.id}, '${fieldId}', ${nefs.key})"
+      >
+        ${nefs.description}
+      </button>
+    `
+  }
+  suggestion.innerHTML = html;
+  colorSuggestions();
+}
+
+// Floating State of the Suggestion Buttons
+let floatSuggestion = [];
+
+function registerSuggestion(nefsId, fieldId, nefsKey) {
+
+}
+
+function colorSuggestions() {
+
 }
