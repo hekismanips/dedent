@@ -1,0 +1,29 @@
+[
+  {
+    "id": "f_1_2_0",
+    "key": "previousDentalTreatment",
+    "name": "Previous Dental Treatment",
+    "logic": null,
+    "repeatable": true,
+    "class": "object",
+    "parentName": "Dental History"
+  },
+  {
+    "id": "f_1_2_1",
+    "key": "homeCare",
+    "name": "Home-Care",
+    "logic": null,
+    "repeatable": true,
+    "class": "object",
+    "parentName": "Dental History"
+  },
+  {
+    "id": "f_1_2_2",
+    "key": "dentalHome",
+    "name": "Dental Home",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Dental History"
+  }
+]

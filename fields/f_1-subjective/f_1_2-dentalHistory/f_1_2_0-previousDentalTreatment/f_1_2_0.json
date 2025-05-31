@@ -1,0 +1,68 @@
+[
+  {
+    "id": "f_1_2_0_0",
+    "key": "procedure",
+    "name": "Procedure",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "libraryId": "cdt",
+    "logicDefinition": null,
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_1",
+    "key": "site",
+    "name": "Site",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_2",
+    "key": "time",
+    "name": "Time",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_3",
+    "key": "statusDate",
+    "name": "Status Date",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "inputType": "list",
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_4",
+    "key": "reason",
+    "name": "Reason",
+    "logic": null,
+    "repeatable": false,
+    "class": "input",
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_5",
+    "key": "locationDetails",
+    "name": "Location Details",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "parentName": "Previous Dental Treatment"
+  },
+  {
+    "id": "f_1_2_0_6",
+    "key": "complication",
+    "name": "Complication",
+    "logic": null,
+    "repeatable": false,
+    "class": "textarea",
+    "parentName": "Previous Dental Treatment"
+  }
+]

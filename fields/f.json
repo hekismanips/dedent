@@ -1,0 +1,52 @@
+[
+  {
+    "id": "f_0",
+    "key": "administrativeMetadata",
+    "name": "Administrative Metadata",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "DERP"
+  },
+  {
+    "id": "f_1",
+    "key": "subjective",
+    "name": "Subjective",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "DERP"
+  },
+  {
+    "id": "f_2",
+    "key": "objective",
+    "name": "Objective",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "DERP"
+  },
+  {
+    "id": "f_3",
+    "key": "plan",
+    "name": "Plan",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "DERP"
+  },
+  {
+    "id": "f_4",
+    "key": "miscellaneous",
+    "name": "Miscellaneous",
+    "logic": null,
+    "repeatable": false,
+    "class": "object",
+    "inputType": null,
+    "parentName": "DERP"
+  }
+]

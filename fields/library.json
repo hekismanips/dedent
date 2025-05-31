@@ -1,0 +1,207 @@
+[
+  {
+    "id": "cdt",
+    "key": "commonDentalTreatments",
+    "description": "Common Dental Treatments",
+    "repeatability": false,
+    "separator": ", ",
+    "data": [
+      {
+        "id": "cdt_0",
+        "key": "general",
+        "description": "General",
+        "data": [
+          {
+            "id": "cdt_0_0",
+            "key": "examination",
+            "description": "examination",
+            "abbreviation": "C/up",
+            "data": null
+          },
+          {
+            "id": "cdt_0_1",
+            "key": "night_guard",
+            "description": "Night Guard",
+            "abbreviation": "NG",
+            "data": null
+          }
+        ]
+      },
+      {
+        "id": "cdt_1",
+        "key": "perio",
+        "description": "Perio",
+        "data": [
+          {
+            "id": "cdt_1_0",
+            "key": "scaling_with_polishing",
+            "description": "Scaling with Polishing",
+            "abbreviation": "SC w/ P",
+            "data": null
+          },
+          {
+            "id": "cdt_1_1",
+            "key": "scaling_without_polishing",
+            "description": "Scaling without polishing",
+            "abbreviation": "SC w/o P",
+            "data": null
+          }
+        ]
+      },
+      {
+        "id": "cdt_2",
+        "key": "resto",
+        "description": "Resto",
+        "data": [
+          {
+            "id": "cdt_2_0", 
+            "key": "permanent_restoration", 
+            "description": "Permanent Restoration", 
+            "abbreviation": "PR",
+            "data": null
+          },
+          {
+            "id": "cdt_2_1", 
+            "key": "temporary_restoration", 
+            "description": "Temporary Restoration", 
+            "abbreviation": "TR",
+            "data": null
+          }
+        ]
+      },
+      {
+        "id": "cdt_3",
+        "key": "os",
+        "description": "OS",
+        "data": [
+          {
+            "id": "cdt_3_0", 
+            "key": "dental_extraction", 
+            "description": "Dental Extraction", 
+            "abbreviation": "XLA",
+            "data": null
+          },
+          {
+            "id": "cdt_3_1", 
+            "key": "minor_oral_surgery", 
+            "description": "Minor Oral Surgery", 
+            "abbreviation": "MOS",
+            "data": null
+          }          
+        ]
+      },
+      {
+        "id": "cdt_4",
+        "key": "prostho",
+        "description": "Prostho",
+        "data": [
+          {
+            "id": "cdt_4_0",
+            "key": "removable_denture",
+            "description": "Removable Denture",
+            "abbreviation": "Denture",
+            "data": null
+          },
+          {
+            "id": "cdt_4_1",
+            "key": "crown_and_bridge",
+            "description": "Crown and bridge",
+            "abbreviation": "C&B",
+            "data": null            
+          },
+          {
+            "id": "cdt_4_2",
+            "key": "dental_implant",
+            "description": "Dental Implant",
+            "abbreviation": "DI",
+            "data": null            
+          },
+          {
+            "id": "cdt_4_3",
+            "key": "fixed_implant-supported_denture",
+            "description": "Fixed Implant-supported Denture",
+            "abbreviation": "FISP",
+            "data": null            
+          },
+          {
+            "id": "cdt_4_4",
+            "key": "removable_implant-supported_denture",
+            "description": "Removable Implant-supported Denture",
+            "abbreviation": "RISP",
+            "data": null            
+          }
+        ]
+      },
+      {
+        "id": "cdt_5",
+        "key": "endo",
+        "description": "Endo",
+        "data": [
+          {
+            "id": "cdt_5_0",
+            "key": "non-surgical_root_canal_treatment",
+            "description": "Non-surgical Root Canal Treatment",
+            "abbreviation": "NS-RCT",
+            "data": null            
+          },
+          {
+            "id": "cdt_5_1",
+            "key": "apical_surgery",
+            "description": "Apical Surgery",
+            "abbreviation": "AS",
+            "data": null               
+          }
+        ]
+      },
+      {
+        "id": "cdt_6",
+        "key": "ortho",
+        "description": "Ortho",
+        "data": [
+          {
+            "id": "cdt_6_0",
+            "key": "fixed_orthodontic_appliance",
+            "description": "Fixed Orthodontic Appliance",
+            "abbreviation": "Braces",
+            "data": null   
+          },
+          {
+            "id": "cdt_6_1",
+            "key": "removable_orthodontic_appliance",
+            "description": "Removable Orthodontic Appliance",
+            "abbreviation": "ROA",
+            "data": null               
+          },
+          {
+            "id": "cdt_6_2",
+            "key": "temporary_anchorage_devices",
+            "description": "Temporary Anchorage Devices",
+            "abbreviation": "TADS",
+            "data": null              
+          }
+        ]
+      },
+      {
+        "id": "cdt_7",
+        "key": "aesthetic",
+        "description": "Aesthetic",
+        "data": [
+          {
+            "id": "cdt_7_0",
+            "key": "teeth_whitening",
+            "description": "Teeth Whitening",
+            "abbreviation": "TW",
+            "data": null
+          },
+          {
+            "id": "cdt_7_1",
+            "key": "veneers",
+            "description": "Veneers",
+            "abbreviation": "VR",
+            "data": null
+          }
+        ]
+      }
+    ]
+  }
+]
