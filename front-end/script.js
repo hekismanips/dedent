@@ -1,7 +1,7 @@
 const body = document.getElementById('body');
 window.onload = function () {
-  renderFields('/fields/f.json', 'body', 'DERP');
-  fetchLibrary('/fields/library.json');
+  renderFields('https://dedent.org/fields/f.json', 'body', 'DERP');
+  fetchLibrary('https://dedent.org/fields/library.json');
   document.getElementById('head').innerHTML = `
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -89,7 +89,7 @@ async function renderFields(jsonPath, containerID, name, repeatability) {
   // define upperPath
   let backButton;
   const parts = jsonPath.split('/');
-  if (parts.length > 3) {
+  if (parts.length > 5) {
     const dir = parts.slice(0, parts.length - 2).join('/');
     const segments = parts[parts.length-2].split('_');
     const prefix = segments.slice(0, -1).join('_');
