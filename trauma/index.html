@@ -154,12 +154,16 @@
   .note-input:focus{outline:none; box-shadow:0 0 0 3px var(--ring); border-color:var(--accent)}
 
   /* Findings */
-  .findings h2{margin:0 0 10px; font-size:16px}
-  .findings .controls{display:flex; gap:8px; margin-bottom:8px}
-  .finding{padding:8px 10px; border:1px solid var(--border); border-radius:10px; margin:6px 0}
-  .finding .tooth-id{font-weight:800}
-  .finding ul{ margin:6px 0 0 18px; padding:0 }
-  .finding li{ margin:3px 0 }
+  .findings .controls{display:flex; gap:8px; margin-left:auto}
+  .findings-summary{
+    margin:0;
+    line-height:1.7;
+    color:var(--ink);
+  }
+  .findings-summary .tooth-entry{
+    display:block;
+    margin-bottom:6px;
+  }
   .no-data{color:var(--muted); font-style:italic}
   
   /* Provisional diagnosis */
@@ -215,13 +219,22 @@
       </section>
 
       <section class="findings" id="findings">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
-          <h2>Findings by tooth</h2>
+        <button class="sec-head" type="button" aria-expanded="true" onclick="toggleFindingsPanel()">
+          <span class="sec-caret down" id="findings-caret"></span>
+          <div class="sec-title">Findings by tooth</div>
           <div class="controls">
-            <button class="btn small ghost" onclick="toggleShorthand()" id="shortToggle">Shorthand: OFF</button>
+            <button
+              class="btn small ghost"
+              type="button"
+              onclick="event.stopPropagation(); toggleShorthand()"
+              id="shortToggle"
+            >Shorthand: OFF</button>
           </div>
+        </button>
+      
+        <div class="group-body" id="findings-body">
+          <p id="findings-list" class="findings-summary"></p>
         </div>
-        <div id="findings-list"></div>
       </section>
       <section class="provisional" id="provisional">
         <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
@@ -1126,21 +1139,37 @@ function buildFindingsBullets(tid){
 }
 function renderFindings(){
   const mount = document.getElementById('findings-list');
-  let html = '';
+  const parts = [];
+
   for (const r of ALL_ROWS){
     for (const t of rows[r]){
       const bullets = buildFindingsBullets(t);
       if (!bullets.length) continue;
+
       const lines = useShorthand ? bullets.map(toShorthand) : bullets;
-      html += `
-        <div class="finding">
-          <div class="tooth-id">${t} -</div>
-          <ul>${lines.map(x=>`<li>${x}</li>`).join('')}</ul>
-        </div>
-      `;
+
+      parts.push(`
+        <span class="tooth-entry">
+          <strong>${t} -</strong> ${lines.join('; ')}
+        </span>
+      `);
     }
   }
-  mount.innerHTML = html || `<div class="no-data">No findings recorded yet.</div>`;
+
+  mount.innerHTML = parts.length
+    ? parts.join('')
+    : `<span class="no-data">No findings recorded yet.</span>`;
+}
+
+function toggleFindingsPanel(){
+  const body = document.getElementById('findings-body');
+  const caret = document.getElementById('findings-caret');
+  const head = document.querySelector('#findings .sec-head');
+
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : '';
+  caret.classList.toggle('down', !open);
+  head.setAttribute('aria-expanded', String(!open));
 }
 
 function toggleShorthand(){
