@@ -1,0 +1,1730 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>IADT Examination Checklist — n-level engine + Dental Chart</title>
+<style>
+  :root{
+    --bg:#f7fbfc; --card:#fff; --ink:#0f172a; --muted:#475569;
+    --accent:#0ea5a6; --ring: rgba(14,165,166,.35);
+    --border:#e5e7eb; --soft:#f1f5f9;
+
+    /* ON / OFF visuals */
+    --on:#16a34a;           /* green-600 */
+    --on-bg:#dcfce7;        /* green-100 */
+    --on-ink:#14532d;       /* green-900 */
+    --warn:#ef4444;         /* red-500 */
+    --warn-bg:#feecec;      /* light red */
+    --warn-ink:#7f1d1d;     /* red-900-ish */
+
+    --badge:#0f766e;        /* teal-700 */
+    --badge-bg:#e6fffb;     /* teal-50-ish */
+  }
+  html,body{height:100%}
+  body{margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;}
+  header{position:sticky; top:0; z-index:10; background:linear-gradient(180deg,#fff,#ffffffea 60%,transparent);
+    border-bottom:1px solid var(--border); backdrop-filter:saturate(140%) blur(4px);}
+  .wrap{max-width:1200px; margin:0 auto; padding:12px 20px 14px}
+  h1{font-size:20px; margin:0}
+  .sub{color:var(--muted); font-size:13px; margin-top:2px}
+  .toolbar{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
+  .btn{appearance:none; border:1px solid var(--border); background:#fff; color:var(--ink);
+    padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:600;}
+  .btn:hover{border-color:#d1d5db}
+  .btn:focus-visible{outline:none; box-shadow:0 0 0 3px var(--ring); border-color:var(--accent)}
+  .btn.ghost{background:transparent}
+  .btn.small{padding:6px 10px; font-weight:700}
+
+  .layout{max-width:1200px; margin:18px auto 60px; padding:0 20px; display:grid; gap:18px}
+  @media (min-width: 1100px){ .layout{grid-template-columns: 390px 1fr} }
+
+  /* Left column: chart + findings stacked */
+  .left-col{display:flex; flex-direction:column; gap:14px; align-self:start}
+  .chart, .findings{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px}
+
+  /* Dental chart */
+  .chart h2{margin:0 0 10px; font-size:16px}
+  .teeth{display:grid; gap:6px}
+  .row{display:grid; grid-template-columns: repeat(8,1fr); gap:6px}
+  .tooth{
+    border:1px solid var(--border); background:#fff; border-radius:8px; padding:10px 0;
+    text-align:center; font-weight:700; cursor:pointer; user-select:none;
+    transition: border-color .15s, background .15s, color .15s;
+  }
+  .tooth:hover{border-color:#d1d5db}
+  .tooth.selected{background:#e0f2fe; border-color:#38bdf8; color:#0c4a6e}
+  .legend{color:var(--muted); font-size:12px; margin-top:8px}
+
+  /* Checklist cards */
+  section.group{
+    background:var(--card); border:1px solid var(--border); border-radius:14px;
+    box-shadow:0 1px 0 rgba(0,0,0,.03); overflow:hidden;
+  }
+  .sec-head{
+    width:100%; text-align:left; background:#fff; border:0; border-bottom:1px solid var(--border);
+    padding:12px 14px; display:flex; align-items:center; gap:10px; cursor:pointer;
+  }
+  .sec-head:focus-visible{outline:none; box-shadow:inset 0 0 0 3px var(--ring)}
+  .sec-title{font-size:16px; font-weight:700; letter-spacing:.2px; flex:1}
+  .sec-caret{width:10px; height:10px; display:inline-block; border:2px solid currentColor; border-left:0; border-bottom:0; transform:rotate(45deg)}
+  .sec-caret.down{transform:rotate(135deg)}
+  .count-pill{
+    display:inline-flex; align-items:center; justify-content:center;
+    min-width:22px; height:22px; padding:0 8px; border-radius:999px;
+    background:var(--badge-bg); color:var(--badge); font-weight:800; font-size:12px;
+  }
+  .group-body{padding:12px 14px}
+  .children{display:flex; flex-wrap:wrap; gap:8px}
+  .node{display:block; width:100%}
+  .node > .children{margin:10px 0 6px 30px; border-left:2px solid var(--soft); padding-left:10px}
+
+  /* “Chip” buttons */
+  button.chip{
+    --pad-x:14px; --pad-y:8px;
+    appearance:none; border:1px solid var(--border);
+    padding: var(--pad-y) var(--pad-x);
+    border-radius:999px; background:#fff; color:var(--ink);
+    cursor:pointer; font-weight:700;
+    display:inline-flex; align-items:center; gap:8px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.02);
+    transition: border-color .15s, box-shadow .15s, background .15s, transform .02s, color .15s, padding .12s ease;
+  }
+  button.chip:hover{border-color:#d1d5db}
+  button.chip:active{transform: translateY(1px)}
+  button.chip:focus-visible{outline:none; box-shadow:0 0 0 3px var(--ring); border-color:var(--accent)}
+
+  /* Active = green */
+  button.chip.active{
+    background: var(--on-bg);
+    border-color: var(--on);
+    color: var(--on-ink);
+  }
+  /* Radio-style sets: visually a bit stronger */
+  button.chip[data-choice="single"].active{
+    background: linear-gradient(0deg, #eaffef, var(--on-bg));
+  }
+
+  /* Hover-cancel animation for active chips */
+  button.chip.active:hover{
+    background: var(--warn-bg);
+    border-color: #fca5a5;
+    color: var(--warn-ink);
+    padding-right: calc(var(--pad-x) + 6px);
+  }
+  /* caret + X swap on hover when active */
+  .caret{width:10px; height:10px; display:inline-block; border:2px solid currentColor; border-left:0; border-bottom:0; transform: rotate(45deg); opacity:.7}
+  .caret.down{ transform: rotate(135deg) }
+  .xicon{display:none; font-weight:900; line-height:0; transform: translateY(-1px)}
+  button.chip.active:hover .caret{display:none}
+  button.chip.active:hover .xicon{display:inline-block}
+
+  /* Exposure (E/D/P) progressive look stays greenish */
+  .exposure-E.active{background:linear-gradient(0deg,#fff, var(--on-bg))}
+  .exposure-D.active{background:linear-gradient(0deg,var(--on-bg), #bfead0)}
+  .exposure-P.active{background:linear-gradient(0deg,#bfead0, #a6e1c0)}
+
+  /* Notes input */
+  .note-wrap{margin:10px 0 0 30px}
+  .note-wrap label{font-size:12px; color:var(--muted); display:block; margin-bottom:4px}
+  .note-input{
+    width:100%; max-width:520px; padding:8px 10px; border:1px solid var(--border); border-radius:10px;
+    background:#fff; color:#0f172a; font:inherit;
+  }
+  .note-input:focus{outline:none; box-shadow:0 0 0 3px var(--ring); border-color:var(--accent)}
+
+  /* Findings */
+  .findings h2{margin:0 0 10px; font-size:16px}
+  .findings .controls{display:flex; gap:8px; margin-bottom:8px}
+  .finding{padding:8px 10px; border:1px solid var(--border); border-radius:10px; margin:6px 0}
+  .finding .tooth-id{font-weight:800}
+  .finding ul{ margin:6px 0 0 18px; padding:0 }
+  .finding li{ margin:3px 0 }
+  .no-data{color:var(--muted); font-style:italic}
+  
+  /* Provisional diagnosis */
+  .provisional{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px;
+  }
+  .provisional h2{margin:0 0 10px; font-size:16px}
+  .prov-infracture{color:var(--muted); font-size:13px; margin-bottom:8px}
+  .prov-list{list-style:none; margin:0; padding:0}
+  .prov-item{margin:10px 0; padding:8px 10px; border:1px solid var(--border); border-radius:10px}
+  .prov-row{display:flex; align-items:center; justify-content:space-between; gap:8px; font-weight:700}
+  .prov-pct{font-variant-numeric: tabular-nums; min-width:34px; text-align:right}
+  .prog{height:8px; background:var(--soft); border-radius:999px; overflow:hidden; margin-top:6px}
+  .prog > span{display:block; height:100%; background:var(--accent); border-radius:999px; width:0%}
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>IADT Examination Checklist</h1>
+      <div class="sub">Dental chart · per-tooth state · n-level hierarchy · exclusivity & cumulative logic</div>
+      <div class="toolbar">
+        <button class="btn" onclick="resetTooth()">Reset current tooth</button>
+        <button class="btn" onclick="resetAll()">Reset all teeth</button>
+        <button class="btn" onclick="exportSelections()">Export selections (JSON)</button>
+        <button class="btn small" onclick="exportFindingsText()">Export findings (TXT)</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- LEFT: chart + findings -->
+    <aside class="left-col">
+      <section class="chart">
+        <h2>Dental chart (FDI)</h2>
+        <div class="teeth">
+          <div class="row" id="row-1"></div>
+          <div class="row" id="row-2"></div>
+          <div class="row" id="row-3"></div>
+          <div class="row" id="row-4"></div>
+        </div>
+        <div class="legend">Click a tooth to edit its findings. Current tooth highlighted.</div>
+      </section>
+
+      <section class="findings" id="findings">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
+          <h2>Findings by tooth</h2>
+          <div class="controls">
+            <button class="btn small ghost" onclick="toggleShorthand()" id="shortToggle">Shorthand: OFF</button>
+          </div>
+        </div>
+        <div id="findings-list"></div>
+      </section>
+      <section class="provisional" id="provisional">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:8px">
+          <h2>Provisional diagnosis (no radiographs)</h2>
+        </div>
+        <div id="prov-infracture" class="prov-infracture"></div>
+        <ul id="prov-list" class="prov-list"></ul>
+      </section>
+    </aside>
+
+    <!-- RIGHT: checklist -->
+    <main id="checklist"></main>
+  </div>
+
+  <footer class="wrap" style="text-align:center; color:var(--muted); font-size:12px; padding:30px 0 50px">
+    Built for DERP/IADT. Structure from <code>description</code>; per-tooth state lives in <code>toothStates</code>.
+  </footer>
+
+<script>
+/* ============================================================
+   DATA MODEL (quickhand list)
+   ============================================================ */
+const description = [
+  ["Inspection",
+    ["Craze line"],
+    ["Discontinuity",
+      ["Type",
+        ["Crown-only", ["Incisal"], ["Middle"], ["Cervical"]],
+        ["Crown-root", ["Supra-alveolar"], ["Sub-alveolar"]],
+        ["Root-only",  ["Cervical"], ["Middle"], ["Apical"]]
+      ],
+      ["Exposure", ["Enamel"], ["Dentin"], ["Pulp"]]
+    ],
+    ["Displacement",
+      ["Labiolingual axis", ["Labial"], ["Palatal/Lingual"]],
+      ["Occlusoapical axis", ["Intruded"], ["Extruded"]]
+    ],
+    ["Occlusal disturbance"]
+  ],
+  ["Palpation",
+    ["Tenderness"],
+    ["Mobility",
+      ["Immobile"],
+      ["Physiological"],
+      ["Increased", ["Grade I"], ["Grade II"], ["Grade III"]]
+      /* Segmental removed (stage 2 will auto-detect) */
+    ],
+    ["Alveolus discontinuity",
+      ["Labial"], ["Palatal/Lingual"]
+    ]
+  ],
+  ["Percussion",
+    ["Tenderness",
+      ["Tenderness force", ["Touch"], ["Light tap"], ["Percussion"]] /* multi-select */
+    ],
+    ["Sound", ["Normal"], ["Metallic"]] /* single-select */
+  ],
+  ["Miscellaneous",
+    ["Bleeding from gingival sulcus"]
+  ],
+  ["Investigation",
+    ["Pulp sensibility",
+      ["Cold/EPT",
+        ["increased sensitivity"],
+        ["normal sensitivity"],
+        ["decreased sensitivity"],
+        ["no response"]
+      ], /* single */
+      ["Air/Sweets Hypersensitivity", ["present"], ["absent"]] /* single */
+    ]
+  ]
+];
+
+/* ============================================================
+   DENTAL CHART & PER-TOOTH STATE
+   ============================================================ */
+const rows = {
+  1: ["18","17","16","15","14","13","12","11"],
+  2: ["21","22","23","24","25","26","27","28"],
+  3: ["48","47","46","45","44","43","42","41"],
+  4: ["31","32","33","34","35","36","37","38"]
+};
+function buildStateTree(descNode){ return [0, ...descNode.slice(1).map(n=>Array.isArray(n)?buildStateTree(n):[0])]; }
+function deepCopyState(s){ return Array.isArray(s) ? s.map(deepCopyState) : s; }
+const defaultState = description.map(buildStateTree);
+const toothStates = {};              // { toothId: stateTree }
+const toothNotes = {};               // { toothId: { occlusion: "" } }
+const collapsedSections = {};        // { toothId: { [sectionIndex]: boolean } }
+let currentTooth = "11";
+let useShorthand = false;
+
+function ensureToothState(tid){
+  if (!toothStates[tid]) toothStates[tid] = defaultState.map(deepCopyState);
+  if (!toothNotes[tid])  toothNotes[tid]  = { occlusion: "" };
+  if (!collapsedSections[tid]) collapsedSections[tid] = {}; // default expanded
+}
+
+/* ============================================================
+   PATH HELPERS
+   ============================================================ */
+function getDesc(path){ return path.reduce((n,i)=> n[i], description); }
+function getState(path, stateTree){ return path.reduce((n,i)=> n[i], stateTree); }
+function setStateFlag(path, val, stateTree){ if (path) getState(path, stateTree)[0] = val; }
+function hasChildren(descNode){ return Array.isArray(descNode) && descNode.length > 1; }
+function parentPath(path){ return path.slice(0, -1); }
+function childIndex(path){ return path[path.length-1]; }
+function pathToDivId(path){ return `div${path.join('-')}`; }
+function pathToBtnId(path){ return `btn${path.join('-')}`; }
+function pathToChildrenId(path){ return `children-${path.join('-')}`; }
+function labelOf(descNode){ return Array.isArray(descNode)? String(descNode[0]) : String(descNode); }
+function isChildOf(path, parent){
+  if (!parent) return false;               // SAFETY GUARD
+  return path.length>parent.length && parent.every((v,i)=>path[i]===v);
+}
+
+function findPathByLabels(labels){
+  let res = null;
+  function dfs(node, path, depth){
+    if (labelOf(node) === labels[depth]){
+      if (depth === labels.length-1){ res = path; return; }
+      for (let i=1;i<node.length;i++) dfs(node[i],[...path,i],depth+1);
+    } else {
+      for (let i=1;i<node.length;i++) dfs(node[i],[...path,i],depth);
+    }
+  }
+  for (let i=0;i<description.length;i++){ dfs(description[i],[i],0); if (res) break; }
+  return res;
+}
+
+/* Anchors */
+const P = {
+  // Inspection
+  craze:               findPathByLabels(["Inspection","Craze line"]),
+  discType:            findPathByLabels(["Inspection","Discontinuity","Type"]),
+  discTypeCrownOnly:   findPathByLabels(["Inspection","Discontinuity","Type","Crown-only"]),
+  discTypeCrownRoot:   findPathByLabels(["Inspection","Discontinuity","Type","Crown-root"]),
+  discTypeRootOnly:    findPathByLabels(["Inspection","Discontinuity","Type","Root-only"]),
+  exposure:            findPathByLabels(["Inspection","Discontinuity","Exposure"]),
+  displLL:             findPathByLabels(["Inspection","Displacement","Labiolingual axis"]),
+  displOA:             findPathByLabels(["Inspection","Displacement","Occlusoapical axis"]),
+  occlusal:            findPathByLabels(["Inspection","Occlusal disturbance"]),
+
+  // Palpation
+  palpTender:          findPathByLabels(["Palpation","Tenderness"]),
+  mob:                 findPathByLabels(["Palpation","Mobility"]),
+  mobImmobile:         findPathByLabels(["Palpation","Mobility","Immobile"]),
+  mobPhysio:           findPathByLabels(["Palpation","Mobility","Physiological"]),
+  mobIncreased:        findPathByLabels(["Palpation","Mobility","Increased"]),
+  alveolus:            findPathByLabels(["Palpation","Alveolus discontinuity"]),
+
+  // Percussion
+  percTender:          findPathByLabels(["Percussion","Tenderness"]),
+  percTenderForce:     findPathByLabels(["Percussion","Tenderness","Tenderness force"]),
+  percSound:           findPathByLabels(["Percussion","Sound"]),
+
+  // Misc
+  bleedSulcus:         findPathByLabels(["Miscellaneous","Bleeding from gingival sulcus"]),
+
+  // Investigation
+  coldEPT:             findPathByLabels(["Investigation","Pulp sensibility","Cold/EPT"]),
+  airSweet:            findPathByLabels(["Investigation","Pulp sensibility","Air/Sweets Hypersensitivity"])
+};
+
+/* ============================================================
+   CHART + SELECTION
+   ============================================================ */
+function renderChart(){
+  for (const r of [1,2,3,4]){
+    const mount = document.getElementById(`row-${r}`);
+    mount.innerHTML = rows[r].map(tid => `
+      <div class="tooth ${tid===currentTooth?'selected':''}" onclick="selectTooth('${tid}')" title="Tooth ${tid}">
+        ${tid}
+      </div>
+    `).join('');
+  }
+}
+function selectTooth(tid){
+  currentTooth = tid;
+  ensureToothState(tid);
+  renderChart();
+  renderChecklist();
+  renderFindings();
+  renderProvisional();
+}
+
+/* ============================================================
+   SECTION COLLAPSIBLES + COUNTS
+   ============================================================ */
+function toggleSection(i){
+  ensureToothState(currentTooth);
+  const map = collapsedSections[currentTooth];
+  map[i] = !map[i];
+  renderChecklist();
+}
+function countActiveLeaves(descNode, stateNode){
+  let count = 0;
+  const hasKids = Array.isArray(descNode) && descNode.length>1;
+  if (!hasKids){
+    return stateNode[0]===1 ? 1 : 0;
+  }
+  let childOn = false;
+  for (let i=1;i<descNode.length;i++){
+    count += countActiveLeaves(descNode[i], stateNode[i]);
+    if (stateNode[i][0]===1) childOn = true;
+  }
+  if (stateNode[0]===1 && !childOn) count += 1;
+  return count;
+}
+
+/* ============================================================
+   RENDER CHECKLIST
+   ============================================================ */
+function renderChecklist(){
+  ensureToothState(currentTooth);
+  const stateTree = toothStates[currentTooth];
+  const collapsed = collapsedSections[currentTooth];
+  const mount = document.getElementById("checklist");
+  let html = '';
+
+  for (let i=0; i<description.length; i++){
+    const group = description[i];
+    const isCollapsed = !!collapsed[i];
+    const count = countActiveLeaves(group, stateTree[i]);
+
+    let bodyHTML = '';
+    if (!isCollapsed){
+      let items = '';
+      for (let j=1; j<group.length; j++){
+        const path = [i,j];
+        items += renderNodeButton(path, labelOf(group[j]), getState(path, stateTree)[0]===1, hasChildren(group[j]));
+      }
+      bodyHTML = `<div class="group-body"><div class="children">${items}</div></div>`;
+    }
+
+    html += `
+      <section class="group">
+        <button class="sec-head" onclick="toggleSection(${i})" aria-expanded="${!isCollapsed}">
+          <span class="sec-caret ${!isCollapsed?'down':''}" aria-hidden="true"></span>
+          <span class="sec-title">${labelOf(group)}</span>
+          ${isCollapsed && count>0 ? `<span class="count-pill" title="${count} updated">${count}</span>` : ``}
+        </button>
+        ${bodyHTML}
+      </section>
+    `;
+  }
+  mount.innerHTML = html;
+
+  // restore open subtrees inside expanded sections
+  for (let i=0; i<description.length; i++){
+    if (collapsed[i]) continue;
+    const group = description[i];
+    for (let j=1; j<group.length; j++){
+      const path = [i,j];
+      const d = getDesc(path), s = getState(path, stateTree);
+      if (s[0]===1 && hasChildren(d)) renderChildren(path);
+    }
+  }
+  addOcclusalNoteIfNeeded();
+}
+
+function renderNodeButton(path, label, active, hasKids){
+  const divId = pathToDivId(path);
+  const btnId = pathToBtnId(path);
+  const controlsId = hasKids ? pathToChildrenId(path) : '';
+  const caret = hasKids ? `<span class="caret ${active?'down':''}" aria-hidden="true"></span>` : '';
+  const xicon = `<span class="xicon" aria-hidden="true">&times;</span>`;
+
+  const isDiscTypeChild = (P.discType && path.length === P.discType.length + 1 && isChildOf(path, P.discType));
+
+  const dataChoice =
+    // ---- Discontinuity → Type direct children are MULTI now ----
+    (isDiscTypeChild) ? 'multi' :
+    // keep single-choice for each Type’s location options and all your other radios
+    (isChildOf(path,P.discTypeCrownOnly) && path.length===P.discTypeCrownOnly.length+1) ? 'single' :
+    (isChildOf(path,P.discTypeCrownRoot) && path.length===P.discTypeCrownRoot.length+1) ? 'single' :
+    (isChildOf(path,P.discTypeRootOnly)  && path.length===P.discTypeRootOnly.length+1)  ? 'single' :
+    (isChildOf(path,P.displLL)           && path.length===P.displLL.length+1)           ? 'single' :
+    (isChildOf(path,P.displOA)           && path.length===P.displOA.length+1)           ? 'single' :
+    (isChildOf(path,P.mobIncreased)      && path.length===P.mobIncreased.length+1)      ? 'single' :
+    (isChildOf(path,P.percSound)         && path.length===P.percSound.length+1)         ? 'single' :
+    (isChildOf(path,P.coldEPT)           && path.length===P.coldEPT.length+1)           ? 'single' :
+    (isChildOf(path,P.airSweet)          && path.length===P.airSweet.length+1)          ? 'single' : 'multi';
+
+  const exposureClass =
+    (isChildOf(path,P.exposure) && path.length===P.exposure.length+1)
+      ? (childIndex(path)===1 ? 'exposure-E' : childIndex(path)===2 ? 'exposure-D' : 'exposure-P')
+      : '';
+
+  return `
+    <div id="${divId}" class="node">
+      <button
+        id="${btnId}"
+        class="chip ${active?'active':''} ${exposureClass}"
+        data-choice="${dataChoice}"
+        data-haskids="${hasKids?1:0}"
+        aria-pressed="${active? 'true':'false'}"
+        ${hasKids ? `aria-expanded="${active? 'true':'false'}" aria-controls="${controlsId}"` : ''}
+        onclick="update(${path.join(',')})"
+      >
+        ${hasKids ? caret : ''}${active ? xicon : ''}<span class="label">${label}</span>
+      </button>
+      ${hasKids && active ? `<div id="${controlsId}" class="children"></div>` : ''}
+    </div>
+  `;
+}
+
+/* ============================================================
+   UPDATE / RENDER CHILDREN
+   ============================================================ */
+function clearChildrenOnly(stateNode){
+  if (!Array.isArray(stateNode)) return;
+  for (let i=1;i<stateNode.length;i++) clearNodeAndDescendants(stateNode[i]);
+}
+function clearNodeAndDescendants(stateNode){
+  if (!Array.isArray(stateNode)) return;
+  stateNode[0] = 0;
+  for (let i=1;i<stateNode.length;i++) clearNodeAndDescendants(stateNode[i]);
+}
+
+// ------------ Family sets (mutually evaluated) ------------
+const FAMILIES = {
+  fractures: [
+    { key: 'Crown fractures',      ids: ['CF_Enamel','CF_ED','CF_Comp'] },
+    { key: 'Crown-root fractures', ids: ['CRF_Uncomp','CRF_Comp'] },
+    { key: 'Root fractures',       ids: ['HRF'] }
+  ],
+  alveolar: [
+    { key: 'Alveolar',             ids: ['ALV_Fx'] }
+  ],
+  luxation: [
+    { key: 'Luxation',             ids: ['Concussion','Sublux','Lux_Extrusive','Lux_Lateral','Lux_Intrusive'] }
+  ]
+};
+
+function update(){
+  ensureToothState(currentTooth);
+  const stateTree = toothStates[currentTooth];
+  const path = Array.from(arguments);
+  const s = getState(path, stateTree);
+  const d = getDesc(path);
+  if (!s || !d) return;
+
+  const wasActive = s[0] === 1;
+
+  // toggle
+  s[0] = wasActive ? 0 : 1;
+
+  // If turning OFF a parent, clear ALL children to 0 (your new rule)
+  if (wasActive && hasChildren(d)){
+    clearChildrenOnly(s);
+  }
+
+  // Behavioral constraints & radios/cumulative
+  applyConstraints(path, stateTree, wasActive);
+
+  // Re-render whole checklist to avoid any stale nodes (also updates section counts)
+  renderChecklist();
+  addOcclusalNoteIfNeeded();
+  renderFindings();
+  renderChart();
+  renderProvisional();
+}
+
+function renderChildren(path){
+  const stateTree = toothStates[currentTooth];
+  const d = getDesc(path), s = getState(path, stateTree);
+  if (!d || !s || !hasChildren(d)) return;
+
+  const container = document.getElementById(pathToDivId(path));
+  if (!container) return;
+
+  const childrenId = pathToChildrenId(path);
+  const childrenHost = container.querySelector(`#${childrenId}`) || (()=>{
+    const div = document.createElement('div');
+    div.className = 'children';
+    div.id = childrenId;
+    container.appendChild(div);
+    return div;
+  })();
+
+  let kids = '';
+  for (let i=1; i<d.length; i++){
+    const childPath = [...path, i];
+    const cd = getDesc(childPath);
+    const cs = getState(childPath, stateTree);
+    kids += renderNodeButton(childPath, labelOf(cd), cs[0]===1, hasChildren(cd));
+  }
+  childrenHost.innerHTML = kids;
+
+  for (let i=1; i<d.length; i++){
+    const childPath = [...path, i];
+    const cd = getDesc(childPath);
+    const cs = getState(childPath, stateTree);
+    if (cs[0] === 1 && hasChildren(cd)){
+      renderChildren(childPath);
+    }
+  }
+}
+
+/* Occlusal note field */
+function addOcclusalNoteIfNeeded(){
+  if (!P.occlusal) return; // guard
+  const stateTree = toothStates[currentTooth];
+  const occlOn = getState(P.occlusal, stateTree)[0]===1;
+  const container = document.getElementById(pathToDivId(P.occlusal));
+  if (!container) return;
+  const existing = container.querySelector('.note-wrap');
+  if (existing) existing.remove();
+  if (!occlOn) return;
+
+  const note = toothNotes[currentTooth]?.occlusion || "";
+  const wrap = document.createElement('div');
+  wrap.className = 'note-wrap';
+  wrap.innerHTML = `
+    <label for="occl-note">Occlusal disturbance notes</label>
+    <input id="occl-note" type="text" class="note-input" placeholder="e.g., premature contact on #${currentTooth} palatal cusp"
+      value="${note.replace(/"/g,'&quot;')}" />
+  `;
+  container.appendChild(wrap);
+  const input = wrap.querySelector('#occl-note');
+  input.addEventListener('input', (e)=>{
+    toothNotes[currentTooth].occlusion = e.target.value;
+    renderFindings();
+  });
+}
+
+/* ============================================================
+   CONSTRAINTS (behaviors)
+   ============================================================ */
+function exclusiveAtParent(path, stateTree){
+  const parent = parentPath(path);
+  const pState = getState(parent, stateTree);
+  const pDesc  = getDesc(parent);
+  const keepIdx = childIndex(path);
+  for (let i=1; i<pDesc.length; i++){
+    if (i === keepIdx) continue;
+    clearNodeAndDescendants(pState[i]);
+  }
+  pState[0] = 1;
+}
+function exposureTransition(path, stateTree, wasActive){
+  const idx = childIndex(path); // 1 Enamel, 2 Dentin, 3 Pulp
+  const parent = parentPath(path);
+  const pState = getState(parent, stateTree);
+  const nowActive = getState(path, stateTree)[0]===1;
+
+  if (!wasActive && nowActive){
+    if (idx === 1){ pState[1][0] = 1; }
+    if (idx === 2){ pState[1][0] = 1; pState[2][0] = 1; }
+    if (idx === 3){ pState[1][0] = 1; pState[2][0] = 1; pState[3][0] = 1; }
+    pState[0] = 1;
+  } else if (wasActive && !nowActive){
+    if (idx === 1){ pState[1][0]=0; pState[2][0]=0; pState[3][0]=0; }
+    if (idx === 2){ pState[2][0]=0; pState[3][0]=0; }
+    if (idx === 3){ pState[3][0]=0; }
+  }
+}
+function mobilityTransition(path, stateTree){
+  if (!(isChildOf(path,P.mob) && path.length === P.mob.length+1)) return;
+  const nowActive = getState(path,stateTree)[0]===1;
+  const clickedLabel = labelOf(getDesc(path));
+  if (!nowActive) return;
+
+  if (clickedLabel === "Immobile"){
+    setStateFlag(P.mobPhysio, 0, stateTree);
+    setStateFlag(P.mobIncreased, 0, stateTree);
+    if (P.mobIncreased){
+      const incState = getState(P.mobIncreased, stateTree);
+      for (let i=1;i<incState.length;i++) clearNodeAndDescendants(incState[i]);
+    }
+  }
+  if (clickedLabel === "Physiological"){
+    setStateFlag(P.mobImmobile, 0, stateTree);
+    setStateFlag(P.mobIncreased, 0, stateTree);
+    if (P.mobIncreased){
+      const incState = getState(P.mobIncreased, stateTree);
+      for (let i=1;i<incState.length;i++) clearNodeAndDescendants(incState[i]);
+    }
+  }
+  if (clickedLabel === "Increased"){
+    setStateFlag(P.mobImmobile, 0, stateTree);
+    setStateFlag(P.mobPhysio, 0, stateTree);
+  }
+}
+
+function applyConstraints(path, stateTree, wasActive){
+  const nowActive = getState(path, stateTree)[0]===1;
+
+  // ---- Discontinuity.Type ----
+  // ALLOW MULTIPLE Type selections (no exclusivity at Type level)
+  // Keep SINGLE selection within each Type's location set:
+  if (isChildOf(path, P.discTypeCrownOnly) && path.length === P.discTypeCrownOnly.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  if (isChildOf(path, P.discTypeCrownRoot) && path.length === P.discTypeCrownRoot.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  if (isChildOf(path, P.discTypeRootOnly) && path.length === P.discTypeRootOnly.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+
+  // ---- Exposure progressive behavior ----
+  if (isChildOf(path, P.exposure) && path.length === P.exposure.length + 1){
+    exposureTransition(path, stateTree, wasActive);
+  }
+
+  // ---- Displacement per-axis (radio) ----
+  if (isChildOf(path, P.displLL) && path.length === P.displLL.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  if (isChildOf(path, P.displOA) && path.length === P.displOA.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+
+  // ---- Mobility grades exclusivity + triad interactions ----
+  if (isChildOf(path, P.mobIncreased) && path.length === P.mobIncreased.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  if (isChildOf(path, P.mob) && path.length === P.mob.length + 1){
+    mobilityTransition(path, stateTree);
+  }
+
+  // ---- Percussion.Sound (single) ----
+  if (isChildOf(path, P.percSound) && path.length === P.percSound.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  // ---- Cold/EPT (single) ----
+  if (isChildOf(path, P.coldEPT) && path.length === P.coldEPT.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+  // ---- Air/Sweets (single) ----
+  if (isChildOf(path, P.airSweet) && path.length === P.airSweet.length + 1 && nowActive){
+    exclusiveAtParent(path, stateTree);
+  }
+}
+
+/* ============================================================
+   FINDINGS (Full vs. Shorthand) — wording keeps from last build
+   ============================================================ */
+function isUpperArch(tid){ const n = parseInt(tid,10); return (n>=11 && n<=28); }
+function mapThird(label){
+  const l = label.toLowerCase();
+  if (l.includes("incisal"))  return "incisal-third";
+  if (l.includes("middle"))   return "middle-third";
+  if (l.includes("cervical")) return "cervical-third";
+  if (l.includes("apical"))   return "apical-third";
+  return label;
+}
+function summarizeTooth(tid){
+  const s = toothStates[tid];
+  if (!s) return null;
+
+  const isUpperArch = (id)=> { const n = parseInt(id,10); return (n>=11 && n<=28); };
+  const mapThird = (label)=>{
+    const l = (label||"").toLowerCase();
+    if (l.includes("incisal"))  return "incisal-third";
+    if (l.includes("middle"))   return "middle-third";
+    if (l.includes("cervical")) return "cervical-third";
+    if (l.includes("apical"))   return "apical-third";
+    return label||"";
+  };
+  const safeOn = (p)=> p ? getState(p, s)[0]===1 : false;
+  const safePick = (p)=>{
+    if (!p) return null;
+    const pDesc = getDesc(p), pState = getState(p, s);
+    for (let i=1; i<pDesc.length; i++){ if (pState[i][0]===1) return labelOf(pDesc[i]); }
+    return null;
+  };
+
+  const phrases = [];
+
+  // Craze line
+  if (safeOn(P.craze)) phrases.push("Craze line.");
+
+  // Discontinuity (crown / crown-root / root)
+  if (safeOn(P.discType)){
+    const tRaw = safePick(P.discType);
+    if (tRaw){
+      let tWord = tRaw; // map crown-only -> crown, root-only -> root
+      if (tRaw === "Crown-only") tWord = "crown";
+      if (tRaw === "Root-only")  tWord = "root";
+
+      let loc = "";
+      if (tRaw==="Crown-only") loc = safePick(P.discTypeCrownOnly);
+      if (tRaw==="Crown-root") loc = safePick(P.discTypeCrownRoot);
+      if (tRaw==="Root-only")  loc = safePick(P.discTypeRootOnly);
+
+      let disc = "Discontinuity " + tWord.toLowerCase();
+      if (loc){
+        if (tRaw==="Crown-only" || tRaw==="Root-only") disc += ` (${mapThird(loc)})`;
+        else disc += ` (${(loc||"").toLowerCase()})`;
+      }
+
+      if (safeOn(P.exposure)){
+        const e = getState(P.exposure, s);
+        const exp = [];
+        if (e[1][0]===1) exp.push("enamel");
+        if (e[2][0]===1) exp.push("dentin");
+        if (e[3][0]===1) exp.push("pulp");
+        if (exp.length===1) disc += `, exposing ${exp[0]}`;
+        if (exp.length===2) disc += `, exposing ${exp[0]} and ${exp[1]}`;
+        if (exp.length===3) disc += `, exposing ${exp[0]}, ${exp[1]}, and ${exp[2]}`;
+      }
+      disc += ".";
+      phrases.push(disc);
+    }
+  }
+
+  // Displacement (no axis words; LL auto Palatal/Lingual by arch)
+  const llRaw = safePick(P.displLL);
+  const oa = safePick(P.displOA);
+  if (llRaw || oa){
+    const seg = [];
+    if (llRaw){
+      const llWord = (llRaw==="Palatal/Lingual")
+        ? (isUpperArch(tid) ? "Palatal" : "Lingual")
+        : llRaw;
+      seg.push(`Displaced ${llWord.toLowerCase()}`);
+    }
+    if (oa){
+      seg.push(oa.charAt(0).toUpperCase() + oa.slice(1).toLowerCase());
+    }
+    phrases.push(seg.join(", ") + ".");
+  }
+
+  // Occlusal disturbance (+ note)
+  if (safeOn(P.occlusal)){
+    const note = toothNotes[tid]?.occlusion?.trim();
+    phrases.push(`Occlusal disturbance${note?` (${note})`:""}.`);
+  }
+
+  // Palpation tenderness
+  if (safeOn(P.palpTender)){
+    phrases.push("Palpation tenderness.");
+  }
+
+  // Mobility
+  if (safeOn(P.mob)){
+    const mState = getState(P.mob, s);
+    if (mState[1][0]===1) phrases.push("Immobile.");
+    else if (mState[2][0]===1) phrases.push("Physiological mobility.");
+    else if (mState[3][0]===1){
+      const g = safePick(P.mobIncreased);
+      phrases.push(g ? `${g.replace("Grade ","G")} mobility.` : "Increased mobility.");
+    }
+  }
+
+  // Alveolus discontinuity (arch-aware wording)
+  if (safeOn(P.alveolus)){
+    const aState = getState(P.alveolus, s);
+    const upper = isUpperArch(tid);
+    const sideWords = [];
+    if (aState[1][0]===1) sideWords.push("Labial");
+    if (aState[2][0]===1) sideWords.push(upper ? "Palatal" : "Lingual");
+    if (sideWords.length) phrases.push(`${sideWords.join(" & ")} alveolar fracture.`);
+  }
+
+  // Percussion tenderness & sound rules
+  const ttpOn = safeOn(P.percTender);
+  const snd   = safePick(P.percSound);
+
+  if (ttpOn){
+    let line = "Percussion tender";
+    if (P.percTenderForce){
+      const fDesc = getDesc(P.percTenderForce), fState = getState(P.percTenderForce, s);
+      const forces = [];
+      for (let i=1;i<fDesc.length;i++){ if (fState[i][0]===1) forces.push(labelOf(fDesc[i]).toLowerCase()); }
+      if (forces.length) line += ` (${forces.join(", ")})`;
+    }
+    phrases.push(line + ".");
+    // (We do NOT add metallic text here unless you want it appended as well)
+  } else if (snd && snd.toLowerCase()==="metallic"){
+    phrases.push("TTP- w/ metallic sound.");
+  }
+
+  // Bleeding from gingival sulcus
+  if (safeOn(P.bleedSulcus)) phrases.push("Bleeding from gingival sulcus.");
+
+  // Pulp sensibility — Air/Sweets only if present
+  const cold = safePick(P.coldEPT);
+  const air  = safePick(P.airSweet);
+  if (cold) phrases.push(`Cold/EPT: ${cold}.`);
+  if (air && air.toLowerCase()==="present") phrases.push(`Air/Sweets: present.`);
+
+  if (!phrases.length) return null;
+  const full = phrases.join(" ");
+  return useShorthand ? toShorthand(full) : full;
+}
+
+
+/* Shorthand translator (unchanged) */
+function toShorthand(text){
+  return text
+    // Discontinuity
+    .replace(/Discontinuity crown-root/gi, 'Disc CR')
+    .replace(/Discontinuity crown/gi,      'Disc CO')
+    .replace(/Discontinuity root/gi,       'Disc RO')
+    .replace(/\(incisal-third\)/gi, '(Inc)')
+    .replace(/\(middle-third\)/gi,  '(Mid)')
+    .replace(/\(cervical-third\)/gi,'(Cerv)')
+    .replace(/\(apical-third\)/gi,  '(Ap)')
+    .replace(/\(supra-alveolar\)/gi,'(Supra)')
+    .replace(/\(sub-alveolar\)/gi,  '(Sub)')
+    .replace(/exposing enamel, dentin, and pulp/gi, 'exposing E+D+P')
+    .replace(/exposing enamel and dentin/gi,        'exposing E+D')
+    .replace(/exposing enamel/gi,                   'exposing E')
+
+    // Displacement
+    .replace(/Displaced labial/gi,  'LL: Labial')
+    .replace(/Displaced palatal/gi, 'LL: Palatal')
+    .replace(/Displaced lingual/gi, 'LL: Lingual')
+    .replace(/\bIntruded\b/gi, 'Intr')
+    .replace(/\bExtruded\b/gi, 'Extr')
+
+    // Palpation / Mobility
+    .replace(/Palpation tenderness\./gi, 'PT.')
+    .replace(/Physiological mobility/gi, 'PhysMob')
+    .replace(/Immobile\./gi, 'Immobile.')
+    .replace(/G1 mobility/gi, 'Mob G1')
+    .replace(/G2 mobility/gi, 'Mob G2')
+    .replace(/G3 mobility/gi, 'Mob G3')
+    .replace(/Increased mobility/gi, 'Mob Inc')
+
+    // Alveolus
+    .replace(/ alveolar fracture/gi, ' Alv Fx')
+
+    // Percussion tenderness -> TTP+
+    .replace(/Percussion tender\s*\(([^)]+)\)\./gi, 'TTP+ ($1).')
+    .replace(/TTP- w\/ metallic sound\./gi, 'TTP- w/ metallic.')
+
+    // Bleeding
+    .replace(/Bleeding from gingival sulcus/gi, 'BGS+')
+
+    // Sensibility
+    .replace(/Cold\/EPT:\s*/g, 'C/E: ')
+    // Air/Sweets: present only (absent never printed now)
+    .replace(/Air\/Sweets:\s*present\./gi, 'AS: +.');
+}
+function buildFindingsBullets(tid){
+  const s = toothStates[tid];
+  if (!s) return [];
+
+  const isUpperArch = (id)=> { const n = parseInt(id,10); return (n>=11 && n<=28); };
+  const mapThird = (label)=>{
+    const l = (label||"").toLowerCase();
+    if (l.includes("incisal"))  return "incisal-third";
+    if (l.includes("middle"))   return "middle-third";
+    if (l.includes("cervical")) return "cervical-third";
+    if (l.includes("apical"))   return "apical-third";
+    return label||"";
+  };
+  const on = (p)=> p ? getState(p, s)[0]===1 : false;
+  const pick = (p)=>{
+    if (!p) return null;
+    const d = getDesc(p), st = getState(p, s);
+    for (let i=1;i<d.length;i++) if (st[i][0]===1) return labelOf(d[i]);
+    return null;
+  };
+
+  const bullets = [];
+
+  // Craze line
+  if (on(P.craze)) bullets.push("Craze line");
+
+  // ---- Discontinuity (MULTI Type) ----
+  if (on(P.discType)){
+    const parts = [];
+
+    if (P.discTypeCrownOnly && getState(P.discTypeCrownOnly, s)[0]===1){
+      const loc = pick(P.discTypeCrownOnly);
+      parts.push(`crown${loc ? ` (${mapThird(loc)})` : ''}`);
+    }
+    if (P.discTypeCrownRoot && getState(P.discTypeCrownRoot, s)[0]===1){
+      const loc = pick(P.discTypeCrownRoot);
+      parts.push(`crown-root${loc ? ` (${(loc||'').toLowerCase()})` : ''}`);
+    }
+    if (P.discTypeRootOnly && getState(P.discTypeRootOnly, s)[0]===1){
+      const loc = pick(P.discTypeRootOnly);
+      parts.push(`root${loc ? ` (${mapThird(loc)})` : ''}`);
+    }
+
+    if (parts.length){
+      let line = `Discontinuity: ${parts.join(' & ')}`;
+      if (on(P.exposure)){
+        const e = getState(P.exposure, s);
+        const exp = [];
+        if (e[1][0]===1) exp.push("enamel");
+        if (e[2][0]===1) exp.push("dentin");
+        if (e[3][0]===1) exp.push("pulp");
+        if (exp.length===1) line += `, exposing ${exp[0]}`;
+        if (exp.length===2) line += `, exposing ${exp[0]} and ${exp[1]}`;
+        if (exp.length===3) line += `, exposing ${exp[0]}, ${exp[1]}, and ${exp[2]}`;
+      }
+      bullets.push(line);
+    }
+  }
+
+  // Displacement (LL auto palatal/lingual by arch; no axis words)
+  const llRaw = pick(P.displLL);
+  const oa = pick(P.displOA);
+  if (llRaw || oa){
+    const parts = [];
+    if (llRaw){
+      const llWord = (llRaw==="Palatal/Lingual")
+        ? (isUpperArch(tid) ? "palatal" : "lingual")
+        : llRaw.toLowerCase();
+      parts.push(llWord);
+    }
+    if (oa){
+      parts.push(oa.charAt(0).toUpperCase()+oa.slice(1).toLowerCase());
+    }
+    bullets.push(`Displacement: ${parts.join(", ")}`);
+  }
+
+  // Occlusal disturbance (with notes)
+  if (on(P.occlusal)){
+    const note = toothNotes[tid]?.occlusion?.trim();
+    bullets.push(`Occlusal disturbance${note?` (${note})`:""}`);
+  }
+
+  // Palpation tenderness
+  if (on(P.palpTender)) bullets.push("Tender on palpation");
+
+  // Mobility (single line)
+  if (on(P.mob)){
+    const m = getState(P.mob, s);
+    if (m[1][0]===1) bullets.push("Immobile");
+    else if (m[2][0]===1) bullets.push("Physiological mobility");
+    else if (m[3][0]===1){
+      const g = pick(P.mobIncreased);
+      bullets.push(g ? `${g.replace("Grade ","G")} mobility` : "Increased mobility");
+    }
+  }
+
+  // Alveolus discontinuity (arch-aware)
+  if (on(P.alveolus)){
+    const a = getState(P.alveolus, s);
+    const sides = [];
+    if (a[1][0]===1) sides.push("Labial");
+    if (a[2][0]===1) sides.push(isUpperArch(tid) ? "Palatal" : "Lingual");
+    if (sides.length) bullets.push(`${sides.join(" & ")} alveolar fracture`);
+  }
+
+  // Percussion: TTP+/TTP- and metallic logic
+  const ttpOn = on(P.percTender);
+  const snd = pick(P.percSound);
+  if (ttpOn){
+    let line = "TTP+";
+    const fDesc = P.percTenderForce ? getDesc(P.percTenderForce) : null;
+    const fState = P.percTenderForce ? getState(P.percTenderForce, s) : null;
+    if (fDesc && fState){
+      const forces = [];
+      for (let i=1;i<fDesc.length;i++) if (fState[i][0]===1) forces.push(labelOf(fDesc[i]).toLowerCase());
+      if (forces.length) line += ` (${forces.join(", ")})`;
+    }
+    if (snd && snd.toLowerCase()==="metallic") line += " w/ metallic sound";
+    bullets.push(line);
+  } else if (snd && snd.toLowerCase()==="metallic"){
+    bullets.push("TTP- w/ metallic sound");
+  }
+
+  // Bleeding from sulcus
+  if (on(P.bleedSulcus)) bullets.push("Bleeding from gingival sulcus +");
+
+  // Sensibility
+  const cold = pick(P.coldEPT);
+  if (cold) bullets.push(`EPT/Cold: ${cold}`);
+  const air  = pick(P.airSweet);
+  if (air && air.toLowerCase()==="present") bullets.push("Air/Sweets Hypersensitivity: present");
+
+  return bullets;
+}
+function renderFindings(){
+  const mount = document.getElementById('findings-list');
+  let html = '';
+  for (const r of [1,2,3,4]){
+    for (const t of rows[r]){
+      const bullets = buildFindingsBullets(t);
+      if (!bullets.length) continue;
+      const lines = useShorthand ? bullets.map(toShorthand) : bullets;
+      html += `
+        <div class="finding">
+          <div class="tooth-id">${t} -</div>
+          <ul>${lines.map(x=>`<li>${x}</li>`).join('')}</ul>
+        </div>
+      `;
+    }
+  }
+  mount.innerHTML = html || `<div class="no-data">No findings recorded yet.</div>`;
+}
+
+function toggleShorthand(){
+  useShorthand = !useShorthand;
+  document.getElementById('shortToggle').textContent = `Shorthand: ${useShorthand?'ON':'OFF'}`;
+  renderFindings();
+}
+
+/* ============================================================
+   EXPORT / RESET
+   ============================================================ */
+function collectSelectionsOfTree(descNode, stateNode, trail=[], out=[]){
+  if (stateNode[0]===1) out.push({path: trail.slice(), label: descNode[0]});
+  for (let i=1;i<descNode.length;i++){
+    collectSelectionsOfTree(descNode[i], stateNode[i], [...trail,i], out);
+  }
+  return out;
+}
+function exportSelections(){
+  const payload = { currentTooth, notes: toothNotes, teeth:{} };
+  for (const r of [1,2,3,4]){
+    for (const t of rows[r]){
+      if (!toothStates[t]) continue;
+      const out=[]; const st=toothStates[t];
+      for (let i=0;i<description.length;i++){
+        collectSelectionsOfTree(description[i], st[i], [i], out);
+      }
+      payload.teeth[t] = out;
+    }
+  }
+  const blob = new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download='iadt_checklist_selections.json';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+}
+function exportFindingsText(){
+  let lines = [];
+  for (const r of [1,2,3,4]){
+    for (const t of rows[r]){
+      const bullets = buildFindingsBullets(t);
+      if (!bullets.length) continue;
+      const out = useShorthand ? bullets.map(toShorthand) : bullets;
+      lines.push(`${t} -`);
+      for (const b of out) lines.push(`- ${b}`);
+      lines.push(''); // blank line between teeth
+    }
+  }
+  const text = lines.join('\n');
+  const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'iadt_findings.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+function resetTooth(){
+  ensureToothState(currentTooth);
+  toothStates[currentTooth] = defaultState.map(deepCopyState);
+  toothNotes[currentTooth] = { occlusion: "" };
+  collapsedSections[currentTooth] = {};
+  renderChecklist(); renderFindings(); renderProvisional();
+}
+function resetAll(){
+  for (const r of [1,2,3,4]){
+    for (const t of rows[r]){
+      delete toothStates[t];
+      delete toothNotes[t];
+      delete collapsedSections[t];
+    }
+  }
+  selectTooth(currentTooth);
+  renderProvisional();
+}
+
+// ======================= Config =======================
+const WEIGHTS = {
+  BASE_HIT: 70,
+  SUPPORT_STRONG: 12,
+  SUPPORT_MOD: 8,
+  CONTRA: 15,
+  MAX_NO_BASE_CAP: 40 // cap if only supports (no base) are present
+};
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+(function init(){
+  ensureToothState(currentTooth);
+  renderChart();
+  renderChecklist();
+  renderFindings();
+  renderProvisional();
+})();
+
+
+
+
+// ================== Feature shape (per tooth) ==================
+// Booleans unless noted. Cold/EPT values: "increased"|"normal"|"decreased"|"noResponse"|null
+// Air/Sweets: "present"|"absent"|null
+// Percussion force flags mean selected (true) for touch/lightTap/percussion.
+/// {
+///   crazeLine,
+///   disc_crown, disc_crownroot, disc_root,
+///   crown_loc_incisal, crown_loc_middle, crown_loc_cervical,
+///   cr_loc_supra, cr_loc_sub,
+///   root_loc_cervical, root_loc_middle, root_loc_apical,
+///   exp_E, exp_D, exp_P,
+///   ll_labial, ll_palatalLingual,
+///   oa_intruded, oa_extruded,
+///   occlusalDisturbance,
+///   palp_ttp,
+///   mob_immobile, mob_physio, mob_inc,
+///   mob_grade: "G1"|"G2"|"G3"|null,
+///   alv_labial, alv_palatalLingual,
+///   perc_ttp, perc_force_touch, perc_force_lightTap, perc_force_percussion,
+///   perc_sound_metallic,
+///   sulcus_bleed,
+///   sens_cold: "increased"|"normal"|"decreased"|"noResponse"|null,
+///   sens_air: "present"|"absent"|null,
+///   // optional future:
+///   segmental_mobility
+/// }
+
+// ================= Helpers (HOISTED) =================
+function any(){ return Array.from(arguments).some(Boolean); }
+function all(){ return Array.from(arguments).every(Boolean); }
+function scoreCapNoBase(raw, baseHit){ return baseHit ? raw : Math.min(raw, WEIGHTS.MAX_NO_BASE_CAP); }
+function clamp0100(x){ return Math.max(0, Math.min(100, x)); }
+function isColdNeg(v){ return v === "noResponse"; }
+
+// convenient shorthands for “one of these locations picked”
+function hasAnyCrownLoc(f){ return any(f.crown_loc_incisal, f.crown_loc_middle, f.crown_loc_cervical); }
+function hasAnyCRLoc(f){ return any(f.cr_loc_supra, f.cr_loc_sub); }
+function hasAnyRootLoc(f){ return any(f.root_loc_cervical, f.root_loc_middle, f.root_loc_apical); }
+function ttpToTouchAndPercussion(f){ return !!(f.perc_ttp && f.perc_force_touch && f.perc_force_percussion); }
+function ttpAllForces(f){ return !!(f.perc_ttp && f.perc_force_touch && f.perc_force_lightTap && f.perc_force_percussion); }
+
+
+// ================= Scoring =================
+function scoreTooth(features){
+  const f = features;
+
+  // D1 Enamel Infracture (deterministic flag only)
+  const enamelInfracture = !!f.crazeLine; // Rule #1
+
+  // container
+  const dxs = [];
+
+  // ---- D2 Uncomplicated Crown Fracture — Enamel (Rule #2)
+  (function(){
+    const base = (f.disc_crown && f.exp_E && !f.exp_D && !f.exp_P);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    // supports (none mandated)
+    // contras: deeper involvement flags (root-only / crown-root base)
+    if (f.disc_root || f.disc_crownroot) s -= WEIGHTS.CONTRA;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"CF_Enamel", label:"Uncomplicated Crown Fracture (Enamel)", raw: clamp0100(s) });
+  })();
+
+  // ---- D3 Uncomplicated Crown Fracture — Enamel-Dentin (Rule #3)
+  (function(){
+    const base = (f.disc_crown && f.exp_E && f.exp_D && !f.exp_P);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.exp_P) s -= WEIGHTS.CONTRA; // contradicts
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"CF_ED", label:"Uncomplicated Crown Fracture (Enamel–Dentin)", raw: clamp0100(s) });
+  })();
+
+  // ---- D4 Complicated Crown Fracture (Rule #4)
+  (function(){
+    const base = (f.disc_crown && f.exp_E && f.exp_D && f.exp_P);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.sens_air === "present") s += WEIGHTS.SUPPORT_STRONG;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"CF_Comp", label:"Complicated Crown Fracture", raw: clamp0100(s) });
+  })();
+
+  // ---- D5 Uncomplicated Crown-Root Fracture (Rule #5)
+  (function(){
+    const base = (f.disc_crownroot && f.exp_E && f.exp_D && !f.exp_P);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.mob_inc) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.perc_ttp) s += WEIGHTS.SUPPORT_STRONG;
+    if (hasAnyCRLoc(f)) s += WEIGHTS.SUPPORT_MOD; // supra/sub noted
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"CRF_Uncomp", label:"Uncomplicated Crown-Root Fracture", raw: clamp0100(s) });
+  })();
+
+  // ---- D6 Complicated Crown-Root Fracture (Rule #6)
+  (function(){
+    const base = (f.disc_crownroot && f.exp_E && f.exp_D && f.exp_P);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.mob_inc) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.perc_ttp) s += WEIGHTS.SUPPORT_STRONG;
+    if (hasAnyCRLoc(f)) s += WEIGHTS.SUPPORT_MOD;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"CRF_Comp", label:"Complicated Crown-Root Fracture", raw: clamp0100(s) });
+  })();
+
+  // ---- D7 Horizontal Root Fracture (Rule #7)
+  (function(){
+    const base = !!f.disc_root;
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.mob_inc) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.perc_ttp) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.sulcus_bleed) s += WEIGHTS.SUPPORT_STRONG;
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    if (hasAnyRootLoc(f)) s += WEIGHTS.SUPPORT_MOD;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"HRF", label:"Horizontal Root Fracture", raw: clamp0100(s) });
+  })();
+
+  // ---- D8 Alveolar Fracture (Rule #8)
+  (function(){
+    const base = (f.alv_labial && f.alv_palatalLingual);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    // partial evidence: one side only -> treat as support (do nothing here if base false)
+    if (!base && (f.alv_labial || f.alv_palatalLingual)) s += WEIGHTS.SUPPORT_MOD;
+    if (f.segmental_mobility) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.occlusalDisturbance) s += WEIGHTS.SUPPORT_STRONG;
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"ALV_Fx", label:"Alveolar Fracture", raw: clamp0100(s) });
+  })();
+
+  // ---- D9 Concussion (Rule #9)
+  (function(){
+    const base = (ttpToTouchAndPercussion(f) && f.mob_physio);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    // Contra
+    if (f.mob_inc) s -= WEIGHTS.CONTRA;
+    if (f.alv_labial || f.alv_palatalLingual) s -= WEIGHTS.CONTRA;
+    if (f.ll_labial || f.ll_palatalLingual || f.oa_intruded || f.oa_extruded) s -= WEIGHTS.CONTRA;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"Concussion", label:"Concussion", raw: clamp0100(s) });
+  })();
+
+  // ---- D10 Subluxation (Rule #10)
+  (function(){
+    const base = (f.perc_ttp && f.mob_inc); // prefer all forces, but any TTP+ qualifies
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (ttpAllForces(f)) s += WEIGHTS.SUPPORT_MOD; // small bump if all 3 forces selected
+    if (f.sulcus_bleed) s += WEIGHTS.SUPPORT_STRONG;
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    // Contra: frank displacement
+    if (f.ll_labial || f.ll_palatalLingual || f.oa_intruded || f.oa_extruded) s -= WEIGHTS.CONTRA;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"Sublux", label:"Subluxation", raw: clamp0100(s) });
+  })();
+
+  // ---- D11 Extrusive Luxation (Rule #11)
+  (function(){
+    const base = !!f.oa_extruded;
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.mob_inc) s += WEIGHTS.SUPPORT_STRONG;
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.oa_intruded) s -= WEIGHTS.CONTRA; // mutual
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"Lux_Extrusive", label:"Extrusive Luxation", raw: clamp0100(s) });
+  })();
+
+  // ---- D12 Lateral Luxation (Rule #12)
+  (function(){
+    const base = (f.ll_labial || f.ll_palatalLingual);
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.alv_labial || f.alv_palatalLingual) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.mob_immobile) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.perc_sound_metallic) s += WEIGHTS.SUPPORT_STRONG; // TTP± ok
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"Lux_Lateral", label:"Lateral Luxation", raw: clamp0100(s) });
+  })();
+
+  // ---- D13 Intrusive Luxation (Rule #13)
+  (function(){
+    const base = !!f.oa_intruded;
+    let s = base ? WEIGHTS.BASE_HIT : 0;
+    if (f.mob_immobile) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.perc_sound_metallic) s += WEIGHTS.SUPPORT_STRONG; // TTP± ok
+    if (isColdNeg(f.sens_cold)) s += WEIGHTS.SUPPORT_STRONG;
+    if (f.oa_extruded) s -= WEIGHTS.CONTRA; // mutual
+    s = scoreCapNoBase(s, base);
+    dxs.push({ id:"Lux_Intrusive", label:"Intrusive Luxation", raw: clamp0100(s) });
+  })();
+
+  // ---------- Normalize ----------
+  const pool = dxs.filter(d=> d.raw > 0);
+  const denom = pool.reduce((a,b)=> a + b.raw, 0);
+  const withPct = pool.map(d => ({
+    ...d,
+    pct: denom ? Math.round(100 * d.raw / denom) : 0
+  })).sort((a,b)=> b.pct - a.pct || b.raw - a.raw);
+
+  // Optional: hide <5% noise unless it’s the only one
+  const filtered = withPct.length > 1 ? withPct.filter(d=> d.pct >= 5) : withPct;
+
+  return {
+    enamelInfracture,            // Rule #1 deterministic (Yes if craze line +)
+    diagnoses: filtered          // array of {id, label, raw, pct}, sorted
+  };
+}
+
+// ------------ Base rule map per diagnosis (non-support logic only) ------------
+function computeBaseMap(f){
+  const base = Object.create(null);
+
+  // Crown fractures (mutually exclusive by exposure)
+  base.CF_Enamel     = !!(f.disc_crown && f.exp_E && !f.exp_D && !f.exp_P);
+  base.CF_ED         = !!(f.disc_crown && f.exp_E &&  f.exp_D && !f.exp_P);
+  base.CF_Comp       = !!(f.disc_crown && f.exp_E &&  f.exp_D &&  f.exp_P);
+
+  // Crown-root fractures
+  base.CRF_Uncomp    = !!(f.disc_crownroot && f.exp_E && f.exp_D && !f.exp_P);
+  base.CRF_Comp      = !!(f.disc_crownroot && f.exp_E && f.exp_D &&  f.exp_P);
+
+  // Root fractures
+  base.HRF           = !!(f.disc_root);
+
+  // Alveolar fracture
+  base.ALV_Fx        = !!(f.alv_labial && f.alv_palatalLingual);
+
+  // Luxation subfamily
+  base.Concussion    = !!(f.perc_ttp && f.perc_force_touch && f.perc_force_percussion && f.mob_physio);
+  base.Sublux        = !!(f.perc_ttp && f.perc_force_touch && f.perc_force_lightTap && f.perc_force_percussion && f.mob_inc);
+  base.Lux_Extrusive = !!(f.oa_extruded);
+  base.Lux_Lateral   = !!(f.ll_labial || f.ll_palatalLingual);
+  base.Lux_Intrusive = !!(f.oa_intruded);
+
+  return base;
+}
+// ------------ Resolve per family into final / ambiguous(%) / probable(%) ------------
+function resolveSubfamily(rawById, baseMap, ids){
+  const bases = ids.filter(id => !!baseMap[id]);
+
+  if (bases.length === 1){
+    const id = bases[0];
+    return { mode: 'final', items: [{ id, raw: rawById[id] || 0, pct: 100 }] };
+  }
+
+  if (bases.length > 1){
+    // multiple defining hits in SAME subfamily → show % using support-weighted raw
+    const denom = bases.reduce((a,id)=> a + (rawById[id]||0), 0);
+    const items = bases.map(id => {
+      const raw = rawById[id] || 0;
+      const pct = denom ? Math.round(100 * raw / denom) : 0;
+      return { id, raw, pct };
+    }).sort((a,b)=> b.pct - a.pct || b.raw - a.raw);
+    return { mode: 'ambiguous', items };
+  }
+
+  // No base → support-only split across members with raw>0
+  const candidates = ids.map(id => ({ id, raw: rawById[id]||0 })).filter(o => o.raw > 0);
+  if (!candidates.length) return { mode: 'none', items: [] };
+
+  const denom = candidates.reduce((a,b)=> a + b.raw, 0);
+  const items = candidates.map(o => ({ ...o, pct: Math.round(100 * o.raw / denom) }))
+                          .sort((a,b)=> b.pct - a.pct || b.raw - a.raw);
+  return { mode: 'probable', items };
+}
+function resolveFamilyGroup(group, rawById, baseMap){
+  const finals = [];
+  const ambiguous = [];
+  const probable = [];
+
+  for (const sub of group){
+    const r = resolveSubfamily(rawById, baseMap, sub.ids);
+    if (r.mode === 'final')       finals.push({ subkey: sub.key, items: r.items });
+    else if (r.mode === 'ambiguous') ambiguous.push({ subkey: sub.key, items: r.items });
+    else if (r.mode === 'probable')  probable.push({ subkey: sub.key, items: r.items });
+  }
+  return { finals, ambiguous, probable };
+}
+function resolveFamily(rawById, baseMap, ids){
+  const baseHits = ids.filter(id => !!baseMap[id]);
+  if (baseHits.length === 1){
+    return { mode: "final", items: [{ id: baseHits[0], pct: 100, raw: rawById[baseHits[0]]||0 }] };
+  }
+  if (baseHits.length > 1){
+    // ambiguous within family → % among base-hit diagnoses only
+    const denom = baseHits.reduce((a,id)=> a + (rawById[id]||0), 0);
+    if (!denom) return { mode: "ambiguous", items: baseHits.map(id=>({id, pct: 0, raw: 0})) };
+    const items = baseHits
+      .map(id => ({ id, raw: rawById[id]||0 }))
+      .map(o => ({ ...o, pct: Math.round(100*o.raw/denom) }))
+      .sort((a,b)=> b.pct - a.pct || b.raw - a.raw);
+    return { mode: "ambiguous", items };
+  }
+  // no base in this family → probable via supports (use all members with nonzero raw)
+  const candidates = ids
+    .map(id => ({ id, raw: rawById[id]||0 }))
+    .filter(o => o.raw > 0);
+  if (!candidates.length) return { mode: "none", items: [] };
+  const denom = candidates.reduce((a,b)=> a + b.raw, 0);
+  const items = candidates
+    .map(o => ({ ...o, pct: Math.round(100*o.raw/denom) }))
+    .sort((a,b)=> b.pct - a.pct || b.raw - a.raw);
+  return { mode: "probable", items };
+}
+
+// ------------ Public entry: returns enamel infracture flag + family outcomes ------------
+function diagnoseTooth(features){
+  const baseMap = computeBaseMap(features);
+  const scored  = scoreTooth(features);            // your existing engine with supports
+  const rawById = {};
+  (scored.diagnoses || []).forEach(d => { rawById[d.id] = d.raw; });
+
+  return {
+    enamelInfracture: !!features.crazeLine,        // Rule #1 flag
+    fractures: resolveFamilyGroup(FAMILIES.fractures, rawById, baseMap),
+    alveolar:  resolveFamilyGroup(FAMILIES.alveolar,  rawById, baseMap),
+    luxation:  resolveFamilyGroup(FAMILIES.luxation,  rawById, baseMap)
+  };
+}
+window.diagnoseTooth = diagnoseTooth;
+
+
+// ================= Example =================
+const exampleFeatures = {
+  crazeLine: false,
+  disc_crown: true, disc_crownroot: false, disc_root: false,
+  crown_loc_incisal: true, crown_loc_middle: false, crown_loc_cervical: false,
+  cr_loc_supra: false, cr_loc_sub: false,
+  root_loc_cervical: false, root_loc_middle: false, root_loc_apical: false,
+  exp_E: true, exp_D: true, exp_P: false,
+  ll_labial: false, ll_palatalLingual: false,
+  oa_intruded: false, oa_extruded: false,
+  occlusalDisturbance: false,
+  palp_ttp: false,
+  mob_immobile: false, mob_physio: true, mob_inc: false,
+  mob_grade: null,
+  alv_labial: false, alv_palatalLingual: false,
+  perc_ttp: true, perc_force_touch: true, perc_force_lightTap: true, perc_force_percussion: true,
+  perc_sound_metallic: false,
+  sulcus_bleed: false,
+  sens_cold: "normal",
+  sens_air: "absent",
+  segmental_mobility: false
+};
+
+console.log(scoreTooth(exampleFeatures));
+
+// ---------- tiny helpers tied to your existing structures ----------
+function isOn(path, stateTree){ return path && getState(path, stateTree)[0] === 1; }
+function childOn(path, idx, stateTree){ 
+  if (!Array.isArray(path)) return false;        // <— guard
+  return isOn([...path, idx], stateTree); 
+}
+function pickChildLabel(path, stateTree){
+  if (!Array.isArray(path)) return null; 
+  const d = getDesc(path), s = getState(path, stateTree);
+  for (let i=1;i<d.length;i++){ if (s[i][0]===1) return labelOf(d[i]); }
+  return null;
+}
+
+function featuresFromState(tid){
+  ensureToothState(tid);
+  const st = toothStates[tid];
+
+  const features = {
+    // Inspection
+    crazeLine:            isOn(P.craze, st),
+    disc_crown:           isOn(P.discTypeCrownOnly, st),
+    disc_crownroot:       isOn(P.discTypeCrownRoot, st),
+    disc_root:            isOn(P.discTypeRootOnly, st),
+
+    crown_loc_incisal:    childOn(P.discTypeCrownOnly, 1, st),
+    crown_loc_middle:     childOn(P.discTypeCrownOnly, 2, st),
+    crown_loc_cervical:   childOn(P.discTypeCrownOnly, 3, st),
+
+    cr_loc_supra:         childOn(P.discTypeCrownRoot, 1, st),
+    cr_loc_sub:           childOn(P.discTypeCrownRoot, 2, st),
+
+    root_loc_cervical:    childOn(P.discTypeRootOnly, 1, st),
+    root_loc_middle:      childOn(P.discTypeRootOnly, 2, st),
+    root_loc_apical:      childOn(P.discTypeRootOnly, 3, st),
+
+    exp_E:                childOn(P.exposure, 1, st),
+    exp_D:                childOn(P.exposure, 2, st),
+    exp_P:                childOn(P.exposure, 3, st),
+
+    ll_labial:            childOn(P.displLL, 1, st),
+    ll_palatalLingual:    childOn(P.displLL, 2, st),
+
+    oa_intruded:          childOn(P.displOA, 1, st),
+    oa_extruded:          childOn(P.displOA, 2, st),
+
+    occlusalDisturbance:  isOn(P.occlusal, st),
+
+    // Palpation
+    palp_ttp:             isOn(P.palpTender, st),
+    mob_immobile:         isOn(P.mobImmobile, st),
+    mob_physio:           isOn(P.mobPhysio, st),
+    mob_inc:              isOn(P.mobIncreased, st),
+    mob_grade:            (()=>{
+                           if (!isOn(P.mobIncreased, st)) return null;
+                           const lab = pickChildLabel(P.mobIncreased, st);
+                           if (!lab) return null;
+                           if (/grade\s*i\b/i.test(lab)) return "G1";
+                           if (/grade\s*ii\b/i.test(lab)) return "G2";
+                           if (/grade\s*iii\b/i.test(lab)) return "G3";
+                           return null;
+                         })(),
+    alv_labial:           childOn(P.alveolus, 1, st),
+    alv_palatalLingual:   childOn(P.alveolus, 2, st),
+
+    // Percussion
+    perc_ttp:             isOn(P.percTender, st),
+    perc_force_touch:     childOn(P.percTenderForce, 1, st),
+    perc_force_lightTap:  childOn(P.percTenderForce, 2, st),
+    perc_force_percussion:childOn(P.percTenderForce, 3, st),
+    perc_sound_metallic:  (pickChildLabel(P.percSound, st)||"").toLowerCase()==="metallic",
+
+    // Misc
+    sulcus_bleed:         isOn(P.bleedSulcus, st),
+
+    // Sensibility
+    sens_cold:            (()=>{
+                           const lab = (pickChildLabel(P.coldEPT, st)||"").toLowerCase();
+                           if (!lab) return null;
+                           if (lab.includes("increased")) return "increased";
+                           if (lab.includes("normal"))    return "normal";
+                           if (lab.includes("decreased")) return "decreased";
+                           if (lab.includes("no response")) return "noResponse";
+                           return null;
+                         })(),
+    sens_air:             (()=>{
+                           const lab = (pickChildLabel(P.airSweet, st)||"").toLowerCase();
+                           if (!lab) return null;
+                           return lab.includes("present") ? "present" : "absent";
+                         })(),
+
+    // future
+    segmental_mobility:   false
+  };
+
+  return features;
+}
+function renderProvisional(){
+  const mountList = document.getElementById('prov-list');
+  const mountInf  = document.getElementById('prov-infracture');
+  if (!mountList || !mountInf) return;
+
+  // 1) features from current tooth state
+  const f   = featuresFromState(currentTooth);
+  const res = diagnoseTooth(f);
+
+  // 2) enamel infracture (deterministic)
+  mountInf.textContent = `Enamel infracture: ${res.enamelInfracture ? 'Yes' : 'No'}`;
+
+  // 3) id→label
+  const labelById = {
+    CF_Enamel: "Uncomplicated Crown Fracture (Enamel)",
+    CF_ED: "Uncomplicated Crown Fracture (Enamel–Dentin)",
+    CF_Comp: "Complicated Crown Fracture",
+    CRF_Uncomp: "Uncomplicated Crown-Root Fracture",
+    CRF_Comp: "Complicated Crown-Root Fracture",
+    HRF: "Horizontal Root Fracture",
+    ALV_Fx: "Alveolar Fracture",
+    Concussion: "Concussion",
+    Sublux: "Subluxation",
+    Lux_Extrusive: "Extrusive Luxation",
+    Lux_Lateral: "Lateral Luxation",
+    Lux_Intrusive: "Intrusive Luxation"
+  };
+
+  // 4) helper to render one top family
+  function familyHTML(title, group){
+    const blocks = [];
+
+    // definitive items (no %)
+    group.finals.forEach(sf=>{
+      sf.items.forEach(it=>{
+        blocks.push(`
+          <li class="prov-item">
+            <div class="prov-row">
+              <span><strong>${title}</strong> — ${labelById[it.id]} <span style="color:var(--muted)">(${sf.subkey})</span></span>
+              <span class="prov-pct">definitive</span>
+            </div>
+          </li>
+        `);
+      });
+    });
+
+    // ambiguous in subfamily (multiple bases) → show %
+    group.ambiguous.forEach(sf=>{
+      const items = sf.items.map(it=>`
+        <div class="prov-row">
+          <span>${labelById[it.id]}</span><span class="prov-pct">${it.pct}%</span>
+        </div>
+        <div class="prog"><span style="width:${it.pct}%"></span></div>
+      `).join('');
+      blocks.push(`
+        <li class="prov-item">
+          <div class="prov-row">
+            <span><strong>${title}</strong> — multiple base findings <span style="color:var(--muted)">(${sf.subkey})</span></span>
+            <span class="prov-pct"></span>
+          </div>
+          ${items}
+        </li>
+      `);
+    });
+
+    // support-only (no base) → show %
+    group.probable.forEach(sf=>{
+      const items = sf.items.map(it=>`
+        <div class="prov-row">
+          <span>${labelById[it.id]}</span><span class="prov-pct">${it.pct}%</span>
+        </div>
+        <div class="prog"><span style="width:${it.pct}%"></span></div>
+      `).join('');
+      blocks.push(`
+        <li class="prov-item">
+          <div class="prov-row">
+            <span><strong>${title}</strong> — support-based <span style="color:var(--muted)">(${sf.subkey})</span></span>
+            <span class="prov-pct"></span>
+          </div>
+          ${items}
+        </li>
+      `);
+    });
+
+    return blocks.join('');
+  }
+
+  // 5) stitch all families
+  const html = [
+    familyHTML('Fracture', res.fractures),
+    familyHTML('Alveolar', res.alveolar),
+    familyHTML('Luxation', res.luxation)
+  ].filter(Boolean).join('');
+
+  mountList.innerHTML = html || `
+    <li class="prov-item">
+      <div class="prov-row"><span>No rule hits yet</span><span class="prov-pct">—</span></div>
+    </li>
+  `;
+}
+
+window.scoreTooth = scoreTooth;
+
+
+</script>
+</body>
+</html>
