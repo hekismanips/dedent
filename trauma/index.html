@@ -26,7 +26,7 @@
     font:15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial;}
   header{position:sticky; top:0; z-index:10; background:linear-gradient(180deg,#fff,#ffffffea 60%,transparent);
     border-bottom:1px solid var(--border); backdrop-filter:saturate(140%) blur(4px);}
-  .wrap{max-width:1200px; margin:0 auto; padding:12px 20px 14px}
+  .wrap{max-width:1540px; margin:0 auto; padding:12px 20px 14px}
   h1{font-size:20px; margin:0}
   .sub{color:var(--muted); font-size:13px; margin-top:2px}
   .toolbar{margin-top:10px; display:flex; gap:8px; flex-wrap:wrap}
@@ -37,24 +37,43 @@
   .btn.ghost{background:transparent}
   .btn.small{padding:6px 10px; font-weight:700}
 
-  .layout{max-width:1200px; margin:18px auto 60px; padding:0 20px; display:grid; gap:18px}
-  @media (min-width: 1100px){ .layout{grid-template-columns: 390px 1fr} }
+  .layout{max-width:1540px; margin:18px auto 60px; padding:0 20px; display:grid; gap:18px}
+  @media (min-width: 1280px){
+    .layout{grid-template-columns:minmax(980px,2.2fr) minmax(260px,.68fr); align-items:start}
+    #checklist{width:min(100%,380px); justify-self:end}
+  }
 
   /* Left column: chart + findings stacked */
-  .left-col{display:flex; flex-direction:column; gap:14px; align-self:start}
-  .chart, .findings{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px}
+  .left-col{display:flex; flex-direction:column; gap:14px; align-self:start; min-width:0}
+  .chart, .findings{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:16px}
 
   /* Dental chart */
-  .chart h2{margin:0 0 10px; font-size:16px}
-  .teeth{display:grid; gap:6px}
-  .row{display:grid; grid-template-columns: repeat(8,1fr); gap:6px}
-  .tooth{
-    border:1px solid var(--border); background:#fff; border-radius:8px; padding:10px 0;
-    text-align:center; font-weight:700; cursor:pointer; user-select:none;
-    transition: border-color .15s, background .15s, color .15s;
+  .chart h2{margin:0; font-size:16px}
+  .chart-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; flex-wrap:wrap}
+  .chart-top .chart-meta{color:var(--muted); font-size:12px}
+  .chart-grid-scroll{overflow-x:auto; padding-bottom:6px}
+  .teeth{display:grid; gap:14px; min-width:1120px}
+  .arch-block{display:grid; gap:8px}
+  .arch-label{font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  .row{display:grid; grid-template-columns:repeat(16,minmax(56px,1fr)); gap:8px}
+  button.tooth-btn{
+    appearance:none; border:1px solid var(--border); background:#fff; color:var(--ink);
+    min-width:56px; min-height:56px; border-radius:14px; cursor:pointer;
+    font-weight:800; font-size:14px; position:relative;
+    transition:border-color .15s, background .15s, box-shadow .15s, transform .02s;
+    box-shadow:0 1px 0 rgba(0,0,0,.02);
   }
-  .tooth:hover{border-color:#d1d5db}
-  .tooth.selected{background:#e0f2fe; border-color:#38bdf8; color:#0c4a6e}
+  button.tooth-btn:hover{border-color:#cbd5e1; background:#f8fafc}
+  button.tooth-btn:active{transform:translateY(1px)}
+  button.tooth-btn:focus-visible{outline:none; box-shadow:0 0 0 3px var(--ring); border-color:var(--accent)}
+  .tooth-btn.quadrant-break{margin-right:16px}
+  .tooth-btn.focused{background:#e0f2fe; border-color:#38bdf8}
+  .tooth-btn.has-data{border-color:#14b8a6; color:#0f766e}
+  .tooth-btn.focused.has-data{border-color:#0284c7; color:#0c4a6e}
+  .tooth-btn.has-data::after{
+    content:''; position:absolute; top:7px; right:7px; width:8px; height:8px;
+    border-radius:999px; background:var(--accent);
+  }
   .legend{color:var(--muted); font-size:12px; margin-top:8px}
 
   /* Checklist cards */
@@ -176,14 +195,23 @@
     <!-- LEFT: chart + findings -->
     <aside class="left-col">
       <section class="chart">
-        <h2>Dental chart (FDI)</h2>
-        <div class="teeth">
-          <div class="row" id="row-1"></div>
-          <div class="row" id="row-2"></div>
-          <div class="row" id="row-3"></div>
-          <div class="row" id="row-4"></div>
+        <div class="chart-top">
+          <h2>Dental chart (FDI)</h2>
+          <div class="chart-meta">16 columns × 2 rows · choose findings first, then click teeth</div>
         </div>
-        <div class="legend">Click a tooth to edit its findings. Current tooth highlighted.</div>
+        <div class="chart-grid-scroll">
+          <div class="teeth">
+            <div class="arch-block">
+              <div class="arch-label">Maxillary</div>
+              <div class="row" id="row-1"></div>
+            </div>
+            <div class="arch-block">
+              <div class="arch-label">Mandibular</div>
+              <div class="row" id="row-2"></div>
+            </div>
+          </div>
+        </div>
+        <div class="legend">Right panel now works like a brush. Select the description(s), then click teeth to apply them. Blue = focused tooth. Teal dot = findings recorded.</div>
       </section>
 
       <section class="findings" id="findings">
@@ -209,7 +237,7 @@
   </div>
 
   <footer class="wrap" style="text-align:center; color:var(--muted); font-size:12px; padding:30px 0 50px">
-    Built for DERP/IADT. Structure from <code>description</code>; per-tooth state lives in <code>toothStates</code>.
+    Built for DERP/IADT. Structure from <code>description</code>; the right panel now acts as a reusable brush, and per-tooth findings still live in <code>toothStates</code>.
   </footer>
 
 <script>
@@ -271,24 +299,24 @@ const description = [
    DENTAL CHART & PER-TOOTH STATE
    ============================================================ */
 const rows = {
-  1: ["18","17","16","15","14","13","12","11"],
-  2: ["21","22","23","24","25","26","27","28"],
-  3: ["48","47","46","45","44","43","42","41"],
-  4: ["31","32","33","34","35","36","37","38"]
+  1: ["18","17","16","15","14","13","12","11","21","22","23","24","25","26","27","28"],
+  2: ["48","47","46","45","44","43","42","41","31","32","33","34","35","36","37","38"]
 };
+const ALL_ROWS = [1,2];
+const ALL_TEETH = ALL_ROWS.flatMap(r => rows[r]);
 function buildStateTree(descNode){ return [0, ...descNode.slice(1).map(n=>Array.isArray(n)?buildStateTree(n):[0])]; }
 function deepCopyState(s){ return Array.isArray(s) ? s.map(deepCopyState) : s; }
 const defaultState = description.map(buildStateTree);
 const toothStates = {};              // { toothId: stateTree }
 const toothNotes = {};               // { toothId: { occlusion: "" } }
-const collapsedSections = {};        // { toothId: { [sectionIndex]: boolean } }
+const brushState = defaultState.map(deepCopyState);
+const brushCollapsedSections = {};
 let currentTooth = "11";
 let useShorthand = false;
 
 function ensureToothState(tid){
   if (!toothStates[tid]) toothStates[tid] = defaultState.map(deepCopyState);
   if (!toothNotes[tid])  toothNotes[tid]  = { occlusion: "" };
-  if (!collapsedSections[tid]) collapsedSections[tid] = {}; // default expanded
 }
 
 /* ============================================================
@@ -360,32 +388,87 @@ const P = {
 /* ============================================================
    CHART + SELECTION
    ============================================================ */
+function toothHasRecordedFindings(tid){
+  return buildFindingsBullets(tid).length > 0;
+}
+
+function brushHasAnySelection(){
+  function walk(node){
+    if (!Array.isArray(node)) return false;
+    if (node[0] === 1) return true;
+    for (let i=1;i<node.length;i++) if (walk(node[i])) return true;
+    return false;
+  }
+  return brushState.some(walk);
+}
+
+function collectActiveBrushPaths(){
+  const out = [];
+  function walk(descNode, stateNode, path){
+    let childOn = false;
+    for (let i=1; i<descNode.length; i++){
+      const childDesc = descNode[i];
+      const childState = stateNode[i];
+      if (childState && childState[0]===1) childOn = true;
+      if (Array.isArray(childDesc) && Array.isArray(childState)) walk(childDesc, childState, [...path, i]);
+    }
+    if (stateNode[0]===1 && !childOn) out.push(path);
+  }
+  for (let i=0; i<description.length; i++) walk(description[i], brushState[i], [i]);
+  return out;
+}
+
+function activatePath(path, stateTree){
+  for (let i=1; i<=path.length; i++){
+    const prefix = path.slice(0, i);
+    const node = getState(prefix, stateTree);
+    if (node) node[0] = 1;
+  }
+  applyConstraints(path, stateTree, false);
+}
+
+function applyBrushToTooth(tid){
+  ensureToothState(tid);
+  const stateTree = toothStates[tid];
+  const activePaths = collectActiveBrushPaths();
+  activePaths.forEach(path => activatePath(path, stateTree));
+}
+
 function renderChart(){
-  for (const r of [1,2,3,4]){
+  const brushOn = brushHasAnySelection();
+  for (const r of ALL_ROWS){
     const mount = document.getElementById(`row-${r}`);
-    mount.innerHTML = rows[r].map(tid => `
-      <div class="tooth ${tid===currentTooth?'selected':''}" onclick="selectTooth('${tid}')" title="Tooth ${tid}">
-        ${tid}
-      </div>
-    `).join('');
+    if (!mount) continue;
+    mount.innerHTML = rows[r].map((tid, idx) => {
+      const hasData = toothHasRecordedFindings(tid);
+      return `
+        <button type="button"
+          class="tooth-btn ${tid===currentTooth?'focused':''} ${hasData?'has-data':''} ${idx===7?'quadrant-break':''}"
+          onclick="selectTooth('${tid}')"
+          title="${brushOn ? 'Apply selected finding(s) to tooth ' : 'Focus tooth '}${tid}"
+          aria-label="${brushOn ? 'Apply selected finding(s) to tooth ' : 'Focus tooth '}${tid}">
+          ${tid}
+        </button>
+      `;
+    }).join('');
   }
 }
 function selectTooth(tid){
   currentTooth = tid;
   ensureToothState(tid);
+  if (brushHasAnySelection()) applyBrushToTooth(tid);
   renderChart();
   renderChecklist();
   renderFindings();
   renderProvisional();
 }
 
+
 /* ============================================================
    SECTION COLLAPSIBLES + COUNTS
    ============================================================ */
 function toggleSection(i){
-  ensureToothState(currentTooth);
-  const map = collapsedSections[currentTooth];
-  map[i] = !map[i];
+  brushCollapsedSections[i] = !brushCollapsedSections[i];
   renderChecklist();
 }
 function countActiveLeaves(descNode, stateNode){
@@ -407,9 +490,8 @@ function countActiveLeaves(descNode, stateNode){
    RENDER CHECKLIST
    ============================================================ */
 function renderChecklist(){
-  ensureToothState(currentTooth);
-  const stateTree = toothStates[currentTooth];
-  const collapsed = collapsedSections[currentTooth];
+  const stateTree = brushState;
+  const collapsed = brushCollapsedSections;
   const mount = document.getElementById("checklist");
   let html = '';
 
@@ -529,8 +611,7 @@ const FAMILIES = {
 };
 
 function update(){
-  ensureToothState(currentTooth);
-  const stateTree = toothStates[currentTooth];
+  const stateTree = brushState;
   const path = Array.from(arguments);
   const s = getState(path, stateTree);
   const d = getDesc(path);
@@ -552,13 +633,11 @@ function update(){
   // Re-render whole checklist to avoid any stale nodes (also updates section counts)
   renderChecklist();
   addOcclusalNoteIfNeeded();
-  renderFindings();
   renderChart();
-  renderProvisional();
 }
 
 function renderChildren(path){
-  const stateTree = toothStates[currentTooth];
+  const stateTree = brushState;
   const d = getDesc(path), s = getState(path, stateTree);
   if (!d || !s || !hasChildren(d)) return;
 
@@ -595,30 +674,9 @@ function renderChildren(path){
 
 /* Occlusal note field */
 function addOcclusalNoteIfNeeded(){
-  if (!P.occlusal) return; // guard
-  const stateTree = toothStates[currentTooth];
-  const occlOn = getState(P.occlusal, stateTree)[0]===1;
-  const container = document.getElementById(pathToDivId(P.occlusal));
-  if (!container) return;
-  const existing = container.querySelector('.note-wrap');
-  if (existing) existing.remove();
-  if (!occlOn) return;
-
-  const note = toothNotes[currentTooth]?.occlusion || "";
-  const wrap = document.createElement('div');
-  wrap.className = 'note-wrap';
-  wrap.innerHTML = `
-    <label for="occl-note">Occlusal disturbance notes</label>
-    <input id="occl-note" type="text" class="note-input" placeholder="e.g., premature contact on #${currentTooth} palatal cusp"
-      value="${note.replace(/"/g,'&quot;')}" />
-  `;
-  container.appendChild(wrap);
-  const input = wrap.querySelector('#occl-note');
-  input.addEventListener('input', (e)=>{
-    toothNotes[currentTooth].occlusion = e.target.value;
-    renderFindings();
-  });
+  return;
 }
+
 
 /* ============================================================
    CONSTRAINTS (behaviors)
@@ -1069,7 +1127,7 @@ function buildFindingsBullets(tid){
 function renderFindings(){
   const mount = document.getElementById('findings-list');
   let html = '';
-  for (const r of [1,2,3,4]){
+  for (const r of ALL_ROWS){
     for (const t of rows[r]){
       const bullets = buildFindingsBullets(t);
       if (!bullets.length) continue;
@@ -1103,7 +1161,7 @@ function collectSelectionsOfTree(descNode, stateNode, trail=[], out=[]){
 }
 function exportSelections(){
   const payload = { currentTooth, notes: toothNotes, teeth:{} };
-  for (const r of [1,2,3,4]){
+  for (const r of ALL_ROWS){
     for (const t of rows[r]){
       if (!toothStates[t]) continue;
       const out=[]; const st=toothStates[t];
@@ -1120,7 +1178,7 @@ function exportSelections(){
 }
 function exportFindingsText(){
   let lines = [];
-  for (const r of [1,2,3,4]){
+  for (const r of ALL_ROWS){
     for (const t of rows[r]){
       const bullets = buildFindingsBullets(t);
       if (!bullets.length) continue;
@@ -1142,18 +1200,20 @@ function resetTooth(){
   ensureToothState(currentTooth);
   toothStates[currentTooth] = defaultState.map(deepCopyState);
   toothNotes[currentTooth] = { occlusion: "" };
-  collapsedSections[currentTooth] = {};
-  renderChecklist(); renderFindings(); renderProvisional();
+  renderChart();
+  renderFindings();
+  renderProvisional();
 }
 function resetAll(){
-  for (const r of [1,2,3,4]){
+  for (const r of ALL_ROWS){
     for (const t of rows[r]){
       delete toothStates[t];
       delete toothNotes[t];
-      delete collapsedSections[t];
     }
   }
-  selectTooth(currentTooth);
+  ensureToothState(currentTooth);
+  renderChart();
+  renderFindings();
   renderProvisional();
 }
 
